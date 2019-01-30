@@ -123,6 +123,10 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 			end)
 		end
 		
+		function NewBoard:ClassName()
+			return "Board"
+		end
+		
 	end
 	return NewBoard
 end
