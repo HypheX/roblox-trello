@@ -1,4 +1,7 @@
 READ THE WIKI!  
-THE API IS CURRENTLY IN THE VERY EARLY STAGES. THE CODE IS PRONE TO SUDDEN CHANGES.  
-I will add all of the basic functions, and also implement custom erorrs.  
-Once all of that is done, I'll release the first stable version.
+  
+I am currently working on a lot of classes, such as labels, members, actions, checklists, etc.  
+I am also working on events.
+  
+The API currently only features basic actions.  
+You can suggest changes, report a bug, or request a feature using an issue.
