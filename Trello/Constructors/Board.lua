@@ -4,7 +4,7 @@ local HTTP = game:GetService("HttpService")
 local auth = require(script.Parent.Parent.auth)
 
 Board.new = function(data, BoardCon, ListCon, CardCon)
-	
+	local Ret
 	if data.id == nil then
 		local purl = "https://api.trello.com/1/boards/"..auth
 		if data then
@@ -15,8 +15,8 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 				purl = purl.."&defaultLists=false"
 			end
 		end
-		local Ret
 		pcall(function()
+			print(purl)
 			Ret = HTTP:JSONDecode(HTTP:PostAsync(purl,"{}"))
 		end)
 	else
@@ -126,7 +126,6 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 		function NewBoard:ClassName()
 			return "Board"
 		end
-		
 	end
 	return NewBoard
 end
