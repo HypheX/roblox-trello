@@ -61,7 +61,7 @@ List.new = function(data, BoardCon, ListCon, CardCon)
 			self:SetProperty("name", newName)
 		end
 		
-		function NewList:SetBoard(newIdBoard)
+		function NewList:Move(newIdBoard)
 			NewList:SetProperty("idBoard", newIdBoard:GetId())
 		end
 	
