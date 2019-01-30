@@ -21,8 +21,8 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 	
 	local NewCard = {}
 	if Ret then
-		---GET
-		local FixedId = Ret.id
+		
+		local FixedId = Ret.id	
 		function NewCard:GetId()
 			return FixedId
 		end
@@ -58,9 +58,7 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 		function NewCard:GetPosition()
 			return (self:GetData().pos)
 		end
-		---POST
 		
-		---PUT
 		function NewCard:SetProperty(property, value)
 			HTTP:RequestAsync({Url = "https://api.trello.com/1/cards/"..self:GetId().."/"..property..auth.."&value="..value, Method = "PUT"})
 		end
@@ -69,14 +67,14 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 			self:SetProperty("name", newName)
 		end
 		
-		function NewCard:SetBoard(newIdBoard)
-			self:SetProperty("idBoard", newIdBoard:GetId())
+		function NewCard:Move(newIdList)
+			self:SetProperty("idCard", newIdList:GetId())
 		end
 		
-		function NewCard:SetArchived(newVal)
+		function NewCard:SetClosed(newVal)
 			self:SetProperty("closed", newVal)
-		end
-		--DELETE	
+		end	
+		
 	
 	end
 	return NewCard
