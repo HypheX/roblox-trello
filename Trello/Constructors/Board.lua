@@ -76,7 +76,9 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 		
 		
 		function NewBoard:SetProperty(property, value)
-			HTTP:RequestAsync({Url = "https://api.trello.com/1/boards/"..self:GetId().."/"..property..auth.."&value="..value, Method = "PUT"})
+			pcall(function()
+				HTTP:RequestAsync({Url = "https://api.trello.com/1/boards/"..self:GetId().."/"..property..auth.."&value="..value, Method = "PUT"})
+			end)
 		end
 		
 		function NewBoard:SetName(newName)
@@ -85,8 +87,17 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 		
 		function NewBoard:SetDesc(newDesc)
 			self:SetProperty("desc", newDesc)
+		end	
+		
+		function NewBoard:SetClosed(newVal)
+			self:SetProperty("closed", newVal)
 		end
 		
+		function NewBoard:Delete()
+			pcall(function()
+				HTTP:RequestAsync({Url = "https://api.trello.com/1/boards/"..self:GetId()..auth, Method = "DELETE"})
+			end)
+		end
 		
 	end
 	return NewBoard
