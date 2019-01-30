@@ -82,15 +82,39 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewBoard:SetName(newName)
-			self:SetProperty("name", newName)
+			if newName then
+				if type(newName) == "string" then
+					self:SetProperty("name", newName)
+				else
+					error("Board:SetName() - string expected, got "..type(newName),0)
+				end
+			else
+				error("Board:SetName() - Argument #1 missing or nil.", 0)
+			end
 		end
 		
 		function NewBoard:SetDesc(newDesc)
-			self:SetProperty("desc", newDesc)
+			if newDesc then
+				if type(newDesc) == "string" then 
+					self:SetProperty("desc", newDesc)
+				else
+					error("Board:SetDesc() - string expected, got "..type(newDesc),0)
+				end
+			else
+				error("Board:SetDesc() - Argument #1 missing or nil.", 0)
+			end
 		end	
 		
 		function NewBoard:SetClosed(newVal)
-			self:SetProperty("closed", newVal)
+			if newVal then
+				if type(newVal) == "boolean" then
+					self:SetProperty("closed", newVal)
+				else
+					error("Board:SetClosed() - boolean expected, got "..type(newVal))
+				end
+			else
+				error("Board:SetClosed() - Argument #1 is missing or nil.", 0)
+			end
 		end
 		
 		function NewBoard:Delete()
