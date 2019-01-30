@@ -16,7 +16,6 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 			end
 		end
 		pcall(function()
-			print(purl)
 			Ret = HTTP:JSONDecode(HTTP:PostAsync(purl,"{}"))
 		end)
 	else
@@ -74,6 +73,25 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 			return obTab
 		end
 		
+		function NewBoard:GetListByName(name)
+			local lists, flist = self:GetData("/lists"), nil
+			for _,v in pairs (lists) do
+				if v.name == name then
+					flist = ListCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+				end
+			end
+			return flist
+		end
+		
+		function NewBoard:GetCardByName(name)
+			local cards, fcard = self:GetData("/cards"), nil
+			for _,v in pairs (cards) do
+				if v.name == name then
+					fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+				end
+			end
+			return fcard
+		end
 		
 		function NewBoard:SetProperty(property, value)
 			pcall(function()
