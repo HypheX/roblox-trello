@@ -3,6 +3,7 @@ local HTTP = game:GetService("HttpService")
 local auth = require(script.Parent.Parent.auth)
 
 List.new = function(data, BoardCon, ListCon, CardCon)
+	local Ret
 	if data.id == nil then
 		local purl = "https://api.trello.com/1/lists/"..auth
 		if data then
@@ -10,7 +11,7 @@ List.new = function(data, BoardCon, ListCon, CardCon)
 				purl = purl.."&"..i.."="..v
 			end
 		end
-		local Ret
+		
 		pcall(function()
 			Ret = HTTP:JSONDecode(HTTP:PostAsync(purl,"{}"))
 		end)
