@@ -77,6 +77,12 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 			self:SetProperty("closed", newVal)
 		end
 		
+		function NewCard:Comment(text)
+			pcall(function()
+				HTTP:PostAsync("https://api.trello.com/1/cards/"..self:GetId().."/actions/comments"..auth.."?text="..text)
+			end)
+		end
+		
 		function NewCard:Delete()
 			pcall(function()
 				HTTP:RequestAsync({Url = "https://api.trello.com/1/cards/"..self:GetId()..auth, Method = "DELETE"})
