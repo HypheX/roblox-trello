@@ -7,7 +7,9 @@ local ConList = {
 		Board = require(Constructors.Board),
 		List = require(Constructors.List),
 		Card = require(Constructors.Card)
-	}
+}
+
+script.Parent.auth:Destroy()
 
 Trello.new = function(className, name, parent)
 	if ConList[className] then
