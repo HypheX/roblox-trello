@@ -66,27 +66,63 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewCard:SetName(newName)
-			self:SetProperty("name", newName)
+			if newName then
+				if type(newName) == "string" then
+					self:SetProperty("name", newName)
+				else
+					error("Card:SetName() - string expected, got "..type(newName), 0)
+				end
+			else
+				error("Card:SetName() - Argument #1 is missing or nil.", 0)
+			end
 		end
 		
 		function NewCard:Move(newIdList)
-			self:SetProperty("idList", newIdList:GetId())
+			if newIdList then
+				if newIdList:ClassName() == "List" then
+					self:SetProperty("idList", newIdList:GetId())
+				else
+					error("Card:Move() - argument is not a List object.", 0)
+				end
+			else
+				error("Card:Move() - Argument #1 is missing or nil.", 0)
+			end
 		end
 		
 		function NewCard:SetClosed(newVal)
-			self:SetProperty("closed", newVal)
+			if newVal then
+				if type(newVal) == "boolean" then
+					self:SetProperty("closed", newVal)
+				else
+					error("Card:SetClosed() - boolean expected, got "..type(newVal), 0)
+				end
+			else
+				error("Card:SetClosed() - Argument #1 is missing or nil.", 0)
+			end
 		end
 		
 		function NewCard:Comment(text)
-			pcall(function()
-				HTTP:PostAsync("https://api.trello.com/1/cards/"..self:GetId().."/actions/comments"..auth.."?text="..text)
-			end)
+			if text then
+				if type(text) == string then
+					pcall(function()
+						HTTP:PostAsync("https://api.trello.com/1/cards/"..self:GetId().."/actions/comments"..auth.."?text="..text)
+					end)
+				else
+					error("Card:Comment() - string expected, got "..type(text), 0)
+				end
+			else
+				error("Card:Comment() - Argument #1 is missing or nil.", 0)
+			end
 		end
 		
 		function NewCard:Delete()
 			pcall(function()
 				HTTP:RequestAsync({Url = "https://api.trello.com/1/cards/"..self:GetId()..auth, Method = "DELETE"})
 			end)
+		end
+		
+		function NewCard:ClassName()
+			return "Card"
 		end
 		
 	
