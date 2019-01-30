@@ -54,6 +54,16 @@ List.new = function(data, BoardCon, ListCon, CardCon)
 			return (self:GetData().pos)
 		end
 		
+		function NewList:GetCardByName(name)
+			local cards, fcard = self:GetData("/cards"), nil
+			for _,v in pairs (cards) do
+				if v.name == name then
+					fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+				end
+			end
+			return fcard
+		end
+		
 		function NewList:SetProperty(property, value)
 			HTTP:RequestAsync({Url = "https://api.trello.com/1/lists/"..self:GetId().."/"..property..auth.."&value="..value, Method = "PUT"})
 		end

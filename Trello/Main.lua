@@ -7,7 +7,9 @@ local ConList = {
 		Board = require(Constructors.Board),
 		List = require(Constructors.List),
 		Card = require(Constructors.Card)
-	}
+}
+
+script.Parent.auth:Destroy()
 
 Trello.new = function(className, name, parent)
 	if ConList[className] then
@@ -53,7 +55,7 @@ function Trello:GetBoardByName(name)
 			end
 		end
 		if fId then
-			return (ConList.Board.new({id = fId}))
+			return (ConList.Board.new({id = fId}, ConList["Board"], ConList["List"], ConList["Card"]))
 		else
 			return nil
 		end
