@@ -60,7 +60,9 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewCard:SetProperty(property, value)
-			HTTP:RequestAsync({Url = "https://api.trello.com/1/cards/"..self:GetId().."/"..property..auth.."&value="..value, Method = "PUT"})
+			pcall(function()
+				HTTP:RequestAsync({Url = "https://api.trello.com/1/cards/"..self:GetId().."/"..property..auth.."&value="..value, Method = "PUT"})
+			end)
 		end
 		
 		function NewCard:SetName(newName)
