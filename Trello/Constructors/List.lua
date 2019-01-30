@@ -58,11 +58,32 @@ List.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewList:SetName(newName)
-			self:SetProperty("name", newName)
+			if newName then
+				if type(newName) == "string" then
+					self:SetProperty("name", newName)
+				else
+					error("List:SetName() - string expected, got "..type(newName), 0)
+				end
+				
+			else
+				error("List:SetName() - Argument #1 is missing or nil.", 0)
+			end
 		end
 		
 		function NewList:Move(newIdBoard)
-			NewList:SetProperty("idBoard", newIdBoard:GetId())
+			if newIdBoard then
+				if newIdBoard:ClassName() == "Board" then
+					NewList:SetProperty("idBoard", newIdBoard:GetId())
+				else
+					error("List:Move() - argument is not a Board object.", 0)
+				end
+			else
+				error("List:Move() - Argument #1 is missing or nil.", 0)
+			end
+		end
+		
+		function NewList:ClassName()
+			return "List"
 		end
 	
 	end
