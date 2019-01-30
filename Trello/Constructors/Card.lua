@@ -70,12 +70,18 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewCard:Move(newIdList)
-			self:SetProperty("idCard", newIdList:GetId())
+			self:SetProperty("idList", newIdList:GetId())
 		end
 		
 		function NewCard:SetClosed(newVal)
 			self:SetProperty("closed", newVal)
-		end	
+		end
+		
+		function NewCard:Delete()
+			pcall(function()
+				HTTP:RequestAsync({Url = "https://api.trello.com/1/cards/"..self:GetId()..auth, Method = "DELETE"})
+			end)
+		end
 		
 	
 	end
