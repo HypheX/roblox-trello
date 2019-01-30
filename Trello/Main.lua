@@ -55,7 +55,7 @@ function Trello:GetBoardByName(name)
 			end
 		end
 		if fId then
-			return (ConList.Board.new({id = fId}))
+			return (ConList.Board.new({id = fId}, ConList["Board"], ConList["List"], ConList["Card"]))
 		else
 			return nil
 		end
