@@ -55,13 +55,21 @@ List.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewList:GetCardByName(name)
-			local cards, fcard = self:GetData("/cards"), nil
-			for _,v in pairs (cards) do
-				if v.name == name then
-					fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+			if name then
+				if type(name) == "string" then
+					local cards, fcard = self:GetData("/cards"), nil
+					for _,v in pairs (cards) do
+						if v.name == name then
+							fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+						end
+					end
+					return fcard	
+				else
+					error("List:GetListByName() - string expected, got "..type(name) , 0)
 				end
+			else
+				error("List:GetListByName() - Argument #1 is missing or nil." , 0)
 			end
-			return fcard
 		end
 		
 		function NewList:SetProperty(property, value)
