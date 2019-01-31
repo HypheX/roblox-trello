@@ -103,9 +103,9 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 		
 		function NewCard:Comment(text)
 			if text then
-				if type(text) == string then
+				if type(text) == "string" then
 					pcall(function()
-						HTTP:PostAsync("https://api.trello.com/1/cards/"..self:GetId().."/actions/comments"..auth.."?text="..text)
+						HTTP:PostAsync("https://api.trello.com/1/cards/"..self:GetId().."/actions/comments"..auth.."&text="..text, "{}")
 					end)
 				else
 					error("Card:Comment() - string expected, got "..type(text), 0)
