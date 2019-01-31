@@ -77,6 +77,18 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 			end
 		end
 		
+		function NewCard:SetDesc(newDesc)
+			if newDesc then
+				if type(newDesc) == "string" then
+					self:SetProperty("desc", newDesc)
+				else
+					error("Card:SetDesci() - string expected, got "..type(newDesc),0)
+				end
+			else
+				error("Card:SetDesc() - Argument #1 is missing or nil.", 0)
+			end
+		end
+		
 		function NewCard:Move(newIdList)
 			if newIdList then
 				if newIdList:ClassName() == "List" then
