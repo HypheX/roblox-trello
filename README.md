@@ -1,5 +1,7 @@
 READ THE WIKI!  
   
+If you need help, join the discord: https://www.discord.gg/RBhP6Ad  
+  
 I am currently working on a lot of classes, such as labels, members, actions, checklists, etc.  
 I am also working on events.
   
