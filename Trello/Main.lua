@@ -1,3 +1,5 @@
+--VERSION 1.1.1
+
 local Trello = {}
 local HTTP = game:GetService("HttpService")
 local auth = require(script.Parent.auth)
