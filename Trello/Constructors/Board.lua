@@ -74,23 +74,39 @@ Board.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewBoard:GetListByName(name)
-			local lists, flist = self:GetData("/lists"), nil
-			for _,v in pairs (lists) do
-				if v.name == name then
-					flist = ListCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+			if name then
+				if type(name) == "string" then
+					local lists, flist = self:GetData("/lists"), nil
+					for _,v in pairs (lists) do
+						if v.name == name then
+							flist = ListCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+						end
+					end
+					return flist
+				else
+					error("Board:GetListByName() - string expected, got "..type(name) , 0)
 				end
+			else
+				error("Board:GetListByName() - Argument #1 is missing or nil." , 0)
 			end
-			return flist
 		end
 		
 		function NewBoard:GetCardByName(name)
-			local cards, fcard = self:GetData("/cards"), nil
-			for _,v in pairs (cards) do
-				if v.name == name then
-					fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+			if name then
+				if type(name) == "string" then
+					local cards, fcard = self:GetData("/cards"), nil
+					for _,v in pairs (cards) do
+						if v.name == name then
+							fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
+						end
+					end
+					return fcard	
+				else
+					error("Board:GetListByName() - string expected, got "..type(name) , 0)
 				end
+			else
+				error("Board:GetListByName() - Argument #1 is missing or nil." , 0)
 			end
-			return fcard
 		end
 		
 		function NewBoard:SetProperty(property, value)
