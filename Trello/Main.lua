@@ -1,4 +1,4 @@
---VERSION 1.1.1
+--VERSION 1.2.0
 
 local Trello = {}
 local HTTP = game:GetService("HttpService")
@@ -31,7 +31,7 @@ Trello.new = function(className, name, parent)
 			if parent then
 				if parent:ClassName() == "List" then
 					return (ConList.Card.new({name = name, idCard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
-				else
+				else	
 					error("Card - argument #3 is not a card.", 0)
 				end
 			else
@@ -65,4 +65,19 @@ function Trello:GetBoardByName(name)
 		error("No name specified!" , 0)
 	end
 end
+
+function Trello:GetBoardById(id)
+	if id then
+		local Ret
+		pcall(function()
+			Ret = HTTP:JSONDecode(HTTP:GetAsync("https://api.trello.com/1/boards/"..tostring(id)..auth))
+		end)
+		
+		if Ret then
+			return (ConList.Board.new({id = tostring(id)}, ConList["Board"], ConList["List"], ConList["Card"]))
+		end
+	end
+end
+
 return Trello
+
