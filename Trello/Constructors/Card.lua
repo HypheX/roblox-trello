@@ -2,7 +2,7 @@ local Card = {}
 local HTTP = game:GetService("HttpService")
 local auth = require(script.Parent.Parent.auth)
 
-Card.new = function(data, BoardCon, ListCon, CardCon)
+Card.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 	local Ret
 	if data.id == nil then
 		local purl = "https://api.trello.com/1/cards/"..auth
@@ -27,10 +27,10 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 			return FixedId
 		end
 		
-		function NewCard:GetData()
+		function NewCard:GetData(suff)
 			local JSON
 			pcall(function()
-				JSON = HTTP:GetAsync("https://api.trello.com/1/cards/"..self:GetId()..auth)
+				JSON = HTTP:GetAsync("https://api.trello.com/1/cards/"..self:GetId()..(suff or "")..auth)
 			end)
 			return (HTTP:JSONDecode(JSON))
 		end
@@ -40,11 +40,19 @@ Card.new = function(data, BoardCon, ListCon, CardCon)
 		end
 		
 		function NewCard:GetBoard()
-			return (BoardCon.new({id = self:GetData().idBoard}))
+			return (BoardCon.new({id = self:GetData().idBoard}, BoardCon, ListCon, CardCon, LabelCon))
 		end
 		
 		function NewCard:GetList()
-			return (ListCon.new({id = self:GetData().idList}))
+			return (ListCon.new({id = self:GetData().idList}, BoardCon, ListCon, CardCon, LabelCon))
+		end
+		
+		function NewCard:GetLabels()
+			local listData, obTab = self:GetData("/labels"),{}
+			for _,v in pairs (listData) do
+				table.insert(obTab, LabelCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon))
+			end
+			return obTab
 		end
 		
 		function NewCard:isSubscribed()
