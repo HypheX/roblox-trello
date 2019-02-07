@@ -8,7 +8,8 @@ local Constructors = script.Parent.Constructors
 local ConList = {
 		Board = require(Constructors.Board),
 		List = require(Constructors.List),
-		Card = require(Constructors.Card)
+		Card = require(Constructors.Card),
+		Label = require(Constructors.Label)
 }
 
 script.Parent.auth:Destroy()
@@ -16,11 +17,11 @@ script.Parent.auth:Destroy()
 Trello.new = function(className, name, parent)
 	if ConList[className] then
 		if className == "Board" then
-			return (ConList.Board.new({name = name}, ConList["Board"], ConList["List"], ConList["Card"]))
+			return (ConList.Board.new({name = name}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
 		elseif className == "List" then
 			if parent then
 				if parent:ClassName() == "Board" then
-					return (ConList.List.new({name = name, idBoard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
+					return (ConList.List.new({name = name, idBoard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
 				else
 					error("List - argument #3 is not a board.", 0)
 				end
@@ -30,7 +31,7 @@ Trello.new = function(className, name, parent)
 		else
 			if parent then
 				if parent:ClassName() == "List" then
-					return (ConList.Card.new({name = name, idCard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
+					return (ConList.Card.new({name = name, idCard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
 				else	
 					error("Card - argument #3 is not a card.", 0)
 				end
@@ -57,7 +58,7 @@ function Trello:GetBoardByName(name)
 			end
 		end
 		if fId then
-			return (ConList.Board.new({id = fId}, ConList["Board"], ConList["List"], ConList["Card"]))
+			return (ConList.Board.new({id = fId}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
 		else
 			return nil
 		end
@@ -74,7 +75,7 @@ function Trello:GetBoardById(id)
 		end)
 		
 		if Ret then
-			return (ConList.Board.new({id = tostring(id)}, ConList["Board"], ConList["List"], ConList["Card"]))
+			return (ConList.Board.new({id = tostring(id)}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
 		end
 	end
 end
