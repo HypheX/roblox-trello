@@ -12,6 +12,31 @@ local ConList = {
 		Label = require(Constructors.Label)
 }
 
+-- Check if HttpService is even enabled. Since we can't index HttpEnabled (?), we need to send a dummy request.
+local t = tick()
+local enabled, dummyResult = pcall(function() return HTTP:RequestAsync({Url = "https://api.trello.com/1/boards/Lh7195Cs", Method = "GET"}) end)
+local ping = tick() - t
+
+if not enabled then
+	error("Aborting - Trello API needs to have HttpService Enabled! Check your Game Settings or run the following in your command line:\ngame:GetService('HttpService').HttpEnabled = true", 0)
+else
+	print("Trello API - Measured Latency: "..tostring(math.ceil(ping*1000)).."ms.")
+	for _,l in pairs ({5, 3, 2, 1, 0.5}) do
+		if ping >= l then
+			warn("Trello API - API Latency is higher than "..tostring(l*1000).."ms!")
+			break
+		end
+	end
+
+	if dummyResult.StatusCode == 200 then
+		print("Trello API - All OK.")
+	elseif dummyResult.StatusCode >= 500 then
+		warn("Trello API - Bad Server Response - "..tostring(dummyResult.StatusCode)..". Service might experience issues.")
+	elseif dummyResult.StatusCode >= 400 then
+		warn("Trello API - Bad Client Request - "..tostring(dummyResult.StatusCode)..". Service might experience issues.")
+	end
+end
+
 script.Parent.auth:Destroy()
 
 Trello.new = function(className, name, parent)

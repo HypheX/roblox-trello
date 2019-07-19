@@ -1,1 +1,4 @@
-return "?key=[KEY HERE]&token=[TOKEN HERE]"
+local KEY = ""
+local TOKEN = ""
+
+return "?key="..KEY.."&token="..TOKEN
