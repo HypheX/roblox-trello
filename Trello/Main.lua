@@ -1,4 +1,4 @@
---VERSION 1.3.1
+local VERSION = "1.3.1"
 
 local Trello = {}
 local HTTP = game:GetService("HttpService")
@@ -11,6 +11,8 @@ local ConList = {
 		Card = require(Constructors.Card),
 		Label = require(Constructors.Label)
 }
+
+print("Trello API - Version "..VERSION)
 
 -- Check if HttpService is even enabled. Since we can't index HttpEnabled (?), we need to send a dummy request.
 local t = tick()
