@@ -3,7 +3,7 @@ local Board = {}
 local HTTP = game:GetService("HttpService")
 local auth = require(script.Parent.Parent.auth)
 
-Board.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
+Board.new = function(data, BoardCon, ListCon, CardCon)
 	local Ret
 	if data.id == nil then
 		local purl = "https://api.trello.com/1/boards/"..auth
@@ -60,7 +60,7 @@ Board.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 		function NewBoard:GetLists()
 			local listData, obTab = self:GetData("/lists"),{}
 			for _,v in pairs (listData) do
-				table.insert(obTab, ListCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon))
+				table.insert(obTab, ListCon.new({id = v.id}, BoardCon, ListCon, CardCon))
 			end
 			return obTab
 		end
@@ -68,15 +68,7 @@ Board.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 		function NewBoard:GetCards()
 			local cardData, obTab = self:GetData("/cards"),{}
 			for _,v in pairs (cardData) do
-				table.insert(obTab, CardCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon))
-			end
-			return obTab
-		end
-		
-		function NewBoard:GetLabels()
-			local labData, obTab = self:GetData("/labels"),{}
-			for _,v in pairs (labData) do
-				table.insert(obTab, LabelCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon))
+				table.insert(obTab, CardCon.new({id = v.id}, BoardCon, ListCon, CardCon))
 			end
 			return obTab
 		end
@@ -87,7 +79,7 @@ Board.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 					local lists, flist = self:GetData("/lists"), nil
 					for _,v in pairs (lists) do
 						if v.name == name then
-							flist = ListCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon)
+							flist = ListCon.new({id = v.id}, BoardCon, ListCon, CardCon)
 						end
 					end
 					return flist
@@ -105,7 +97,7 @@ Board.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 					local cards, fcard = self:GetData("/cards"), nil
 					for _,v in pairs (cards) do
 						if v.name == name then
-							fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon)
+							fcard = CardCon.new({id = v.id}, BoardCon, ListCon, CardCon)
 						end
 					end
 					return fcard	
@@ -148,7 +140,7 @@ Board.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 		end	
 		
 		function NewBoard:SetClosed(newVal)
-			if newVal ~= nil then
+			if newVal then
 				if type(newVal) == "boolean" then
 					self:SetProperty("closed", newVal)
 				else
