@@ -2,7 +2,7 @@ local Card = {}
 local HTTP = game:GetService("HttpService")
 local auth = require(script.Parent.Parent.auth)
 
-Card.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
+Card.new = function(data, BoardCon, ListCon, CardCon)
 	local Ret
 	if data.id == nil then
 		local purl = "https://api.trello.com/1/cards/"..auth
@@ -27,10 +27,10 @@ Card.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 			return FixedId
 		end
 		
-		function NewCard:GetData(suff)
+		function NewCard:GetData()
 			local JSON
 			pcall(function()
-				JSON = HTTP:GetAsync("https://api.trello.com/1/cards/"..self:GetId()..(suff or "")..auth)
+				JSON = HTTP:GetAsync("https://api.trello.com/1/cards/"..self:GetId()..auth)
 			end)
 			return (HTTP:JSONDecode(JSON))
 		end
@@ -40,19 +40,15 @@ Card.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 		end
 		
 		function NewCard:GetBoard()
-			return (BoardCon.new({id = self:GetData().idBoard}, BoardCon, ListCon, CardCon, LabelCon))
+			return (BoardCon.new({id = self:GetData().idBoard}))
 		end
 		
 		function NewCard:GetList()
-			return (ListCon.new({id = self:GetData().idList}, BoardCon, ListCon, CardCon, LabelCon))
+			return (ListCon.new({id = self:GetData().idList}))
 		end
 		
-		function NewCard:GetLabels()
-			local listData, obTab = self:GetData("/labels"),{}
-			for _,v in pairs (listData) do
-				table.insert(obTab, LabelCon.new({id = v.id}, BoardCon, ListCon, CardCon, LabelCon))
-			end
-			return obTab
+		function NewCard:GetDesc()
+			return (self:GetData().desc)
 		end
 		
 		function NewCard:isSubscribed()
@@ -82,18 +78,6 @@ Card.new = function(data, BoardCon, ListCon, CardCon, LabelCon)
 				end
 			else
 				error("Card:SetName() - Argument #1 is missing or nil.", 0)
-			end
-		end
-		
-		function NewCard:SetDesc(newDesc)
-			if newDesc then
-				if type(newDesc) == "string" then
-					self:SetProperty("desc", newDesc)
-				else
-					error("Card:SetDesci() - string expected, got "..type(newDesc),0)
-				end
-			else
-				error("Card:SetDesc() - Argument #1 is missing or nil.", 0)
 			end
 		end
 		
