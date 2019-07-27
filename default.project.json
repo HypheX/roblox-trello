@@ -1,0 +1,14 @@
+{
+    "name": "Sample Text",
+    "tree": {
+        "$className": "DataModel",
+
+        "ServerScriptService": {
+            "$className": "ServerScriptService",
+            "$ignoreUnknownInstances": true,
+            "Trello": {
+                "$path": "Trello"
+            }
+        }
+    }
+}
