@@ -8,8 +8,7 @@ local Constructors = script.Parent.Constructors
 local ConList = {
 		Board = require(Constructors.Board),
 		List = require(Constructors.List),
-		Card = require(Constructors.Card),
-		Label = require(Constructors.Label)
+		Card = require(Constructors.Card)
 }
 
 print("Trello API - Version "..VERSION)
@@ -44,11 +43,11 @@ script.Parent.auth:Destroy()
 Trello.new = function(className, name, parent)
 	if ConList[className] then
 		if className == "Board" then
-			return (ConList.Board.new({name = name}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
+			return (ConList.Board.new({name = name}, ConList["Board"], ConList["List"], ConList["Card"]))
 		elseif className == "List" then
 			if parent then
 				if parent:ClassName() == "Board" then
-					return (ConList.List.new({name = name, idBoard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
+					return (ConList.List.new({name = name, idBoard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
 				else
 					error("List - argument #3 is not a board.", 0)
 				end
@@ -58,7 +57,7 @@ Trello.new = function(className, name, parent)
 		else
 			if parent then
 				if parent:ClassName() == "List" then
-					return (ConList.Card.new({name = name, idCard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"], ConList["Label"]))
+					return (ConList.Card.new({name = name, idCard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
 				else	
 					error("Card - argument #3 is not a card.", 0)
 				end
