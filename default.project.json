@@ -8,15 +8,14 @@
         "HttpEnabled": true
       }
     },
-    "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "Trello": {
-        "$path": "src"
-      }
-    },
     "ServerScriptService": {
       "$className": "ServerScriptService",
-      "$path": "tests"
+      "Trello": {
+        "$path": "src"
+      },
+      "Tests": {
+        "$path": "tests"
+      }
     }
   }
 }
