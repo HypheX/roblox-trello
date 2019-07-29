@@ -42,14 +42,14 @@ local function Request(url, method, body)
     if (method == HttpMethod.GET or method == HttpMethod.HEAD or method == HttpMethod.DELETE) and body then
         -- While the DELETE method actually accepts a body, it is ignored, so it's best to leave it empty.
         requestBody.Body = nil
-        warn("[Trello/HTTP.Request]: Tried to send a payload with an invalid method ("..method..").")
+        warn("[Trello/HTTP.Request]: Tried to send a payload with an invalid method (" .. method .. ").")
     elseif not body and (method == HttpMethod.PUT or method == HttpMethod.POST) then
-        error("[Trello/HTTP.Request]: The method used ("..method..") requires a payload body, but it doesn't exist!", 0)
+        error("[Trello/HTTP.Request]: The method used (" .. method .. ") requires a payload body, but it doesn't exist!", 0)
     end
 
     if requestBody.Body then
         requestBody.Headers = {
-            ["Content-Type"] = "application/json"
+            ["content-type"] = "application/json"
         }
     end
 
@@ -65,7 +65,7 @@ local function Request(url, method, body)
         if Result.Headers["content-type"]:sub(1, 16) == "application/json" then
             Result.Body = http:JSONDecode(Result.Body)
         else
-            warn("[Trello/HTTP.Request]: Response is not in format 'application/json' (got '"..Result.Headers["content-type"].."'). Not parsing.")
+            warn("[Trello/HTTP.Request]: Response is not in format 'application/json' (got '" .. Result.Headers["content-type"] .. "'). Not parsing.")
         end
 
         return Result
@@ -92,21 +92,21 @@ local function RequestInsist(url, method, body, pedantic_assert)
         tries = tries + 1
 
         if not content.LuaSuccess then
-            warn("[Trello/HTTP.RequestInsist]: Request failed at Lua level: '"..content.SystemResponse.."'")
+            warn("[Trello/HTTP.RequestInsist]: Request failed at Lua level: '" .. content.SystemResponse .. "'")
         elseif content.StatusCode == 429 then
-            warn("[Trello/HTTP.RequestInsist]: (429 Too Many Requests) API is throttling requests. Halting for "..tostring(content.Headers["Retry-After"]).." seconds.")
+            warn("[Trello/HTTP.RequestInsist]: (429 Too Many Requests) API is throttling requests. Halting for " .. tostring(content.Headers["Retry-After"]) .. " seconds.")
             wait(content.Headers["Retry-After"])
         elseif content.StatusCode == 404 then
             warn("[Trello/HTTP.RequestInsist]: (404 Not Found) Nothing was found. Returning empty (nil) body.")
             content.Body = nil
             return content
         elseif content.StatusCode >= 500 then
-            warn("[Trello/HTTP.RequestInsist]: API threw server error ("..tostring(content.StatusCode)..": "..content.StatusMessage..").")
+            warn("[Trello/HTTP.RequestInsist]: API threw server error (" .. tostring(content.StatusCode) .. ": "..content.StatusMessage..").")
         else
             if pedantic_assert and content.StatusCode >= 400 then
-                error("[Trello/HTTP.RequestInsist]: Bad request from client ("..tostring(content.StatusCode)..": "..content.StatusMessage..").", 0)
+                error("[Trello/HTTP.RequestInsist]: Bad request from client (" .. tostring(content.StatusCode) .. ": "..content.StatusMessage..").", 0)
             elseif content.StatusCode >= 400 then
-                warn("[Trello/HTTP.RequestInsist]: Bad request from client ("..tostring(content.StatusCode)..": "..content.StatusMessage..").")
+                warn("[Trello/HTTP.RequestInsist]: Bad request from client (" .. tostring(content.StatusCode) .. ": "..content.StatusMessage..").")
             end
             return content
         end
