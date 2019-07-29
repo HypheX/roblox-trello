@@ -7,7 +7,7 @@
 --]]
 
 local Trello = require(game.ServerScriptService.Trello)
-local TrelloHttp = require(game.ServerScriptService.Trello.http)
+local TrelloHttp = require(game.ServerScriptService.Trello.TrelloHttp)
 
 wait(2)
 

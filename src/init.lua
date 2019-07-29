@@ -8,7 +8,7 @@
 
 -- Module Global Version
 local VERSION = "2.0.0-dev.2"
-local HTTP = require(script.http)
+local HTTP = require(script.TrelloHttp)
 
 -- TrelloEnity Metatable
 local META_TrelloEntity = {
