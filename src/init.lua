@@ -7,7 +7,7 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.1"
+local VERSION = "2.0.0-dev.2"
 local HTTP = require(script.http)
 
 -- TrelloEnity Metatable
