@@ -2,8 +2,5 @@ READ THE WIKI!
   
 If you need help, join the discord: https://www.discord.gg/RBhP6Ad  
   
-I am currently working on a lot of classes, such as labels, members, actions, checklists, etc.  
-I am also working on events.
-  
-The API currently only features basic actions.  
-You can suggest changes, report a bug, or request a feature using an issue.
+The version in this branch is v1. It has been discontinued to favor the development of v2!
+https://github.com/HypheX/roblox-trello/issues/6
