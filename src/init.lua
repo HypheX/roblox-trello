@@ -44,15 +44,15 @@ function TrelloEntity.new(key, token, pedantic_assert)
     local AUTH_STR = "key="..key.."&token="..(token or "")
 
 	-- Perform authentication validation and assertation
-	local dummyRequest = HTTP.Request("https://api.trello.com/1/members/me?"..AUTH_STR, HTTP.HttpMethod.GET)
+	local dummyRequest = HTTP.Request("https://api.trello.com/1/members/me?" .. AUTH_STR, HTTP.HttpMethod.GET)
 
 	if not dummyRequest.LuaSuccess then
-		error("[TrelloEntity.new]: Fatal Error has been thrown by HttpService ("..dummyRequest.SystemResponse..").", 0)
+		error("[TrelloEntity.new]: Fatal Error has been thrown by HttpService (" .. dummyRequest.SystemResponse .. ").", 0)
 	else
-        print("[TrelloEntity.new]: Measured Latency: "..tostring(math.ceil(dummyRequest.Latency*1000)).."ms.")
+        print("[TrelloEntity.new]: Measured Latency: " .. tostring(math.ceil(dummyRequest.Latency*1000)) .. "ms.")
         for _,l in pairs ({5, 3, 2, 1, 0.5}) do
             if dummyRequest.Latency >= l then
-                warn("[TrelloEntity.new]: API Latency is higher than "..tostring(l*1000).."ms!")
+                warn("[TrelloEntity.new]: API Latency is higher than " .. tostring(l*1000) .. "ms!")
                 break
             end
         end
@@ -60,12 +60,12 @@ function TrelloEntity.new(key, token, pedantic_assert)
         if dummyRequest.StatusCode == 200 then
             print("[TrelloEntity.new]: All OK.")
         elseif dummyRequest.StatusCode >= 500 then
-            warn("[TrelloEntity.new]: Bad Server Response - "..tostring(dummyRequest.StatusCode)..". Service might be experiencing issues.")
+            warn("[TrelloEntity.new]: Bad Server Response - " .. tostring(dummyRequest.StatusCode) .. ". Service might be experiencing issues.")
         elseif dummyRequest.StatusCode >= 400 then
             if pedantic_assert then
-                error("[TrelloEntity.new]: Bad Client Request - "..tostring(dummyRequest.StatusCode)..". Check your authentication keys!", 0)
+                error("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!", 0)
             end
-			warn("[TrelloEntity.new]: Bad Client Request - "..tostring(dummyRequest.StatusCode)..". Check your authentication keys!")
+			warn("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
 		end
     end
 
@@ -74,9 +74,59 @@ function TrelloEntity.new(key, token, pedantic_assert)
     TrelloEntity.Auth = AUTH_STR
     TrelloEntity.User = dummyRequest.Body.fullName
 
-    print("Successfully authenticated as "..TrelloEntity.User..". Welcome!")
+    --[[**
+        Creates a syntactically correct URL for use within the module. Authentication is automatically appended.
+
+        @param [t:String] page The page that you wish to request to. Base URL is https://api.trello.com/1/ (page cannot be empty).
+        @param [t:Variant<Dictionary,nil>] query_fields A dictionary (indexes must to be strings) with any extra fields you want to query the API with.
+        
+        @returns [t:String] A URL you can make requests to.
+    **--]]
+    function TrelloEntity:MakeURL(page, query_fields)
+        if not page or page == "" then
+            error("[TrelloEntity.MakeURL]: Page argument is empty!", 0)
+        end
+
+        local newURL = "https://api.trello.com/1/"
+
+        -- It's likely that we're going to mix '/page' with 'page' so better handle both cases
+        if page:sub(1, 1) == "/" then
+            newURL = newURL .. page:sub(2, -1)
+        else
+            newURL = newURL .. page
+        end
+
+        -- Tie the knot with the authentication and return
+        if not query_fields then
+            return newURL .. "?" .. self.Auth
+        end
+
+        -- Add query parameters and return
+        local queryURL = "?"
+        for field, value in pairs (query_fields) do
+            if type(field) ~= "string" then
+                error("[TrelloEntity.MakeURL]: query_fields must to be a dictionary and all indexes must to be strings!", 0)
+            end
+
+            -- Handle array values
+            queryURL = queryURL .. field .. "="
+            if type(value) == "table" then
+                for i = 1, #value - 1 do
+                    queryURL = queryURL .. tostring(value[i]) .. ","
+                end
+                queryURL = queryURL .. tostring(value[#value])
+            else
+                queryURL = queryURL .. tostring(value)
+            end
+            queryURL = queryURL .. "&"
+        end
+
+        return newURL .. queryURL .. self.Auth
+    end
+
+    print("[TrelloEntity.new]: Successfully authenticated as " .. TrelloEntity.User .. ". Welcome!")
     return setmetatable(TrelloEntity, META_TrelloEntity)
 end
 
-warn("Using Roblox-Trello, VERSION "..VERSION..".")
+warn("Using Roblox-Trello, VERSION " .. VERSION .. ".")
 return TrelloEntity
