@@ -59,6 +59,8 @@ function TrelloBoard.new(entity, name, public)
     TrelloBoard.Name = name
     TrelloBoard.LocalId = ""
     TrelloBoard.RemoteId = result.Body.id
+    TrelloBoard.Public = public
+    TrelloBoard.Closed = false
     TrelloBoard._Git = {}
 
     return setmetatable(TrelloBoard, META_TrelloBoard)
@@ -70,10 +72,37 @@ end
     @param [t:TrelloEntity] entity The entity the board will be assigned to.
     @param [t:String] name The Board's ID.
 
-    @returns [t:TrelloBoard] The Trello Board fetched.
+    @returns [t:Variant<TrelloBoard,nil>] The Trello Board fetched. Returns nil if the board doesn't exist.
 **--]]
 function TrelloBoard.fromRemote(entity, remoteId)
+    if not entity or getmetatable(entity) ~= "TrelloEntity" then
+        error("[TrelloBoard.fromRemote]: Invalid entity!", 0)
+    elseif not remoteId or remoteId == "" then
+        error("[TrelloBoard.fromRemote]: Invalid board id!", 0)
+    end
 
+    local commitURL = entity:MakeURL("/boards/" .. remoteId, {
+        customFields = false,
+        card_pluginData = false,
+        fields = {"name","desc","descData","closed","prefs"},
+    })
+
+    local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
+
+    if not result.Body then
+        return nil -- API returned 404, board doesn't exist.
+    end
+
+    local TrelloBoard = {}
+
+    TrelloBoard.Name = result.Body.name
+    TrelloBoard.LocalId = ""
+    TrelloBoard.RemoteId = result.Body.id
+    TrelloBoard.Public = result.Body.prefs.permissionLevel == "public"
+    TrelloBoard.Closed = result.Body.closed
+    TrelloBoard._Git = {}
+
+    return setmetatable(TrelloBoard, META_TrelloBoard)
 end
 
 return TrelloBoard

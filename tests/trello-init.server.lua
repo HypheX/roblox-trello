@@ -37,3 +37,10 @@ local board2 = TrelloClass.Board.new(id, "My Awesome Explicit Private Board", fa
 print(board2.RemoteId)
 local board3 = TrelloClass.Board.new(id, "My Awesome Public Board", true)
 print(board3.RemoteId)
+
+local myAwesomeBoard = TrelloClass.Board.fromRemote(id, board1.RemoteId)
+for i, v in pairs(myAwesomeBoard) do
+    print(i .. ": ".. tostring(v))
+end
+
+warn("TEST END.")
