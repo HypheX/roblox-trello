@@ -7,14 +7,17 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.2"
+local VERSION = "2.0.0-dev.3"
 local HTTP = require(script.TrelloHttp)
+local CLASS = require(script.TrelloClass)
 
--- TrelloEnity Metatable
+-- TrelloEntity Metatable
 local META_TrelloEntity = {
     __tostring = "TrelloEntity",
 
-    -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware. 
+    __metatable = "TrelloEntity",
+
+    -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware.
     __index = function(_, index)
         error("[TrelloEntity]: Attempted to index non-existant property "..tostring(index)..".", 0)
     end,

@@ -8,6 +8,7 @@
 
 local Trello = require(game.ServerScriptService.Trello)
 local TrelloHttp = require(game.ServerScriptService.Trello.TrelloHttp)
+local TrelloClass = require(game.ServerScriptService.Trello.TrelloClass)
 
 wait(2)
 
@@ -29,3 +30,10 @@ end
 mkurlsend("/members/me")
 mkurlsend("members/me", {boardsInvited = "all"})
 mkurlsend("batch", {urls = {"/members/me", "/members/me?boardsInvited=all"}})
+
+local board1 = TrelloClass.Board.new(id, "My Awesome Private Board")
+print(board1.RemoteId)
+local board2 = TrelloClass.Board.new(id, "My Awesome Explicit Private Board", false)
+print(board2.RemoteId)
+local board3 = TrelloClass.Board.new(id, "My Awesome Public Board", true)
+print(board3.RemoteId)
