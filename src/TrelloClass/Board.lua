@@ -25,6 +25,9 @@ local META_TrelloBoard = {
     end
 }
 
+-- Local function prototype to make a board based on a body dump
+local makeBoard
+
 local TrelloBoard = {}
 
 --[[**
@@ -54,16 +57,7 @@ function TrelloBoard.new(entity, name, public)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.POST, "{}", true)
 
-    local TrelloBoard = {}
-
-    TrelloBoard.Name = name
-    TrelloBoard.LocalId = ""
-    TrelloBoard.RemoteId = result.Body.id
-    TrelloBoard.Public = public
-    TrelloBoard.Closed = false
-    TrelloBoard._Git = {}
-
-    return setmetatable(TrelloBoard, META_TrelloBoard)
+    return makeBoard(entity, result.Body)
 end
 
 --[[**
@@ -89,18 +83,34 @@ function TrelloBoard.fromRemote(entity, remoteId)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
 
-    if not result.Body then
-        return nil -- API returned 404, board doesn't exist.
+    return makeBoard(entity, result.Body)
+end
+
+-- Prototype implementation
+makeBoard = function(entity, data)
+    if not data then
+        return nil
     end
 
     local TrelloBoard = {}
 
-    TrelloBoard.Name = result.Body.name
+    TrelloBoard.Name = data.name
     TrelloBoard.LocalId = ""
-    TrelloBoard.RemoteId = result.Body.id
-    TrelloBoard.Public = result.Body.prefs.permissionLevel == "public"
-    TrelloBoard.Closed = result.Body.closed
+    TrelloBoard.RemoteId = data.id
+    TrelloBoard.Public = data.prefs.permissionLevel == "public"
+    TrelloBoard.Closed = data.closed
     TrelloBoard._Git = {}
+
+    --[[**
+        Deletes this board from Trello. All garbage collection is up to the developer to perform.
+
+        @returns [t:Void]
+    **--]]
+    function TrelloBoard:Delete()
+        local commitURL = entity:MakeURL("/boards/" .. TrelloBoard.RemoteId)
+
+        HTTP.RequestInsist(commitURL, HTTP.HttpMethod.DELETE, nil, true)
+    end
 
     return setmetatable(TrelloBoard, META_TrelloBoard)
 end

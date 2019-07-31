@@ -19,18 +19,6 @@ local id = Trello.new("API KEY", "API TOKEN")
 
 print("Authentication string: " .. id.Auth)
 
-function mkurlsend(p, q)
-    local url = id:MakeURL(p, q)
-    warn("\nURL: " .. url)
-    
-    local x = TrelloHttp.RequestInsist(url, TrelloHttp.HttpMethod.GET)
-    print(TrelloHttp.JSONEncode(x.Body))
-end
-
-mkurlsend("/members/me")
-mkurlsend("members/me", {boardsInvited = "all"})
-mkurlsend("batch", {urls = {"/members/me", "/members/me?boardsInvited=all"}})
-
 local board1 = TrelloClass.Board.new(id, "My Awesome Private Board")
 print(board1.RemoteId)
 local board2 = TrelloClass.Board.new(id, "My Awesome Explicit Private Board", false)
@@ -42,5 +30,12 @@ local myAwesomeBoard = TrelloClass.Board.fromRemote(id, board1.RemoteId)
 for i, v in pairs(myAwesomeBoard) do
     print(i .. ": ".. tostring(v))
 end
+
+board1:Delete()
+board2:Delete()
+board3:Delete()
+
+-- Was also board1, should return a 404.
+myAwesomeBoard:Delete()
 
 warn("TEST END.")
