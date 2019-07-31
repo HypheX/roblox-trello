@@ -1,6 +1,6 @@
 <h1><p align=center>Roblox Trello (v2-dev)</p></h1>
 <h2><p align=center>🐉 Here be dragons! 🐉</p></h2>
-<h4><p align=center>Current Developer Version: [2.0.0-dev.2]</p></h4>
+<h4><p align=center>Current Developer Version: [2.0.0-dev.5]</p></h4>
 
 If you need help, join our [Discord Server](https://www.discord.gg/RBhP6Ad)!
 
