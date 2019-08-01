@@ -37,7 +37,7 @@ local TrelloBoard = {}
     @param [t:String] name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
     @param [t:Boolean] public Whether the board is public or not. If this field is not provided, the board will be private.
 
-    @returns [t:TrelloEntity] A new TrelloEntity, representing your account.
+    @returns [t:TrelloBoard] A new TrelloBoard that was freshly created.
 **--]]
 function TrelloBoard.new(entity, name, public)
     if not entity or getmetatable(entity) ~= "TrelloEntity" then
