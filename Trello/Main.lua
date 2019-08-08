@@ -57,7 +57,7 @@ Trello.new = function(className, name, parent)
 		else
 			if parent then
 				if parent:ClassName() == "List" then
-					return (ConList.Card.new({name = name, idCard = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
+					return (ConList.Card.new({name = name, idList = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
 				else	
 					error("Card - argument #3 is not a card.", 0)
 				end
