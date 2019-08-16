@@ -4,6 +4,7 @@
         "$className": "DataModel",
 
         "ServerScriptService": {
+            "$path": "Tests",
             "$className": "ServerScriptService",
             "$ignoreUnknownInstances": true,
             "Trello": {
