@@ -1,4 +1,4 @@
-local VERSION = "1.3.3"
+local VERSION = "1.3.4"
 
 local Trello = {}
 local HTTP = game:GetService("HttpService")
@@ -15,7 +15,7 @@ print("Trello API - Version "..VERSION)
 
 -- Check if HttpService is even enabled. Since we can't index HttpEnabled (?), we need to send a dummy request.
 local t = tick()
-local enabled, dummyResult = pcall(function() return HTTP:RequestAsync({Url = "https://api.trello.com/1/boards/Lh7195Cs", Method = "GET"}) end)
+local enabled, dummyResult = pcall(function() return HTTP:RequestAsync({Url = "https://api.trello.com/1/boards/Lh7195Cs"..auth, Method = "GET"}) end)
 local ping = tick() - t
 
 if not enabled then
