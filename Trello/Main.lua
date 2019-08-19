@@ -1,4 +1,4 @@
-local VERSION = "1.3.4"
+local VERSION = "1.3.5"
 
 local Trello = {}
 local HTTP = game:GetService("HttpService")
