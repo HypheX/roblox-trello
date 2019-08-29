@@ -1,4 +1,4 @@
-local VERSION = "1.3.5"
+local VERSION = "1.3.6"
 
 local Trello = {}
 local HTTP = game:GetService("HttpService")
@@ -34,7 +34,7 @@ else
 	elseif dummyResult.StatusCode >= 500 then
 		warn("Trello API - Bad Server Response - "..tostring(dummyResult.StatusCode)..". Service might experience issues.")
 	elseif dummyResult.StatusCode >= 400 then
-		warn("Trello API - Bad Client Request - "..tostring(dummyResult.StatusCode)..". Service might experience issues.")
+		warn("Trello API - Bad Client Request - "..tostring(dummyResult.StatusCode)..". Please check your authorization key/token pair!\nRead the auth module on how to get those.")
 	end
 end
 
@@ -59,7 +59,7 @@ Trello.new = function(className, name, parent)
 				if parent:ClassName() == "List" then
 					return (ConList.Card.new({name = name, idList = parent:GetId()}, ConList["Board"], ConList["List"], ConList["Card"]))
 				else	
-					error("Card - argument #3 is not a card.", 0)
+					error("Card - argument #3 is not a list.", 0)
 				end
 			else
 				error("Card - List not specified!", 0)
