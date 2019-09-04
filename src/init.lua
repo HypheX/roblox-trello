@@ -7,7 +7,7 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.5"
+local VERSION = "2.0.0-dev.6"
 local HTTP = require(script.TrelloHttp)
 local CLASS = require(script.TrelloClass)
 
@@ -29,29 +29,48 @@ local META_TrelloEntity = {
 }
 
 local TrelloEntity = {}
+local function toURL(value)
+    local returns = ""
+
+    if type(value) == "table" then
+        for i = 1, #value - 1 do
+            returns = returns .. tostring(value[i]) .. ","
+        end
+        return returns .. tostring(value[#value])
+    else
+        return tostring(value)
+    end
+end
 
 --[[**
     Creates a new TrelloEntity, that represents a Trello account.
 
     @param [t:String] key Your developer key. Cannot be empty or nil.
-    @param [t:Variant<String,nil>] token Your developer token. Optional if you're only reading from a public board.
+    @param [t:Variant<String,nil>] token Your developer token. Optional if you're only READING from a PUBLIC board.
     @param [t:Boolean] pedantic_assert Whether an error should be thrown (instead of a warning) if key validation fails.
 
-    @returns [t:TrelloEntity] A new TrelloEntity, representing your account.
+    @returns [t:Variant<TrelloEntity,nil>] A new TrelloEntity, representing your account. Returns nil if key validation fails (with pedantic_assert disabled).
 **--]]
 function TrelloEntity.new(key, token, pedantic_assert)
     if not key or key == "" then
         error("[TrelloEntity.new]: You need a key to authenticate yourself!", 0)
     end
 
-    local AUTH_STR = "key="..key.."&token="..(token or "")
+    local AUTH_STR = "key="..key..((token and token ~= "") and "&token="..token or "")
 
-	-- Perform authentication validation and assertation
-	local dummyRequest = HTTP.Request("https://api.trello.com/1/members/me?" .. AUTH_STR, HTTP.HttpMethod.GET)
+    -- Perform authentication validation and assertation
+    print("https://api.trello.com/1/members/me?" .. AUTH_STR)
+    local dummyRequest
+    if token and token ~= "" then
+        dummyRequest = HTTP.Request("https://api.trello.com/1/members/me?" .. AUTH_STR, HTTP.HttpMethod.GET)
+    else
+        -- We don't have a particular user authenticated, so we'll resort to this - a public board.
+        dummyRequest = HTTP.Request("https://api.trello.com/1/boards/5d6f8ec6764c2112a27e3d12?" .. AUTH_STR, HTTP.HttpMethod.GET)
+    end
 
-	if not dummyRequest.LuaSuccess then
-		error("[TrelloEntity.new]: Fatal Error has been thrown by HttpService (" .. dummyRequest.SystemResponse .. ").", 0)
-	else
+    if not dummyRequest.LuaSuccess then
+        error("[TrelloEntity.new]: Fatal Error has been thrown by HttpService (" .. dummyRequest.SystemResponse .. ").", 0)
+    else
         print("[TrelloEntity.new]: Measured Latency: " .. tostring(math.ceil(dummyRequest.Latency*1000)) .. "ms.")
         for _,l in pairs ({5, 3, 2, 1, 0.5}) do
             if dummyRequest.Latency >= l then
@@ -68,8 +87,9 @@ function TrelloEntity.new(key, token, pedantic_assert)
             if pedantic_assert then
                 error("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!", 0)
             end
-			warn("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
-		end
+            warn("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
+            return nil
+        end
     end
 
     -- All tests passed, we can make the TrelloEntity.
@@ -83,7 +103,7 @@ function TrelloEntity.new(key, token, pedantic_assert)
         @param [t:String] page The page that you wish to request to. Base URL is https://api.trello.com/1/ (page cannot be empty).
         @param [t:Variant<Dictionary,nil>] query_fields A dictionary (indexes must to be strings) with any extra fields you want to query the API with.
         
-        @returns [t:String] A URL you can make requests to.
+        @returns [t:String] A URL string you can make requests to.
     **--]]
     function TrelloEntity:MakeURL(page, query_fields)
         if not page or page == "" then
@@ -111,23 +131,25 @@ function TrelloEntity.new(key, token, pedantic_assert)
                 error("[TrelloEntity.MakeURL]: query_fields must to be a dictionary and all indexes must to be strings!", 0)
             end
 
-            -- Handle array values
-            queryURL = queryURL .. field .. "="
-            if type(value) == "table" then
-                for i = 1, #value - 1 do
-                    queryURL = queryURL .. tostring(value[i]) .. ","
+            if type(value) == "table" and not value[0] then
+                -- This is a dictionary
+                for i, v in pairs(value) do
+                    queryURL = queryURL .. field .. "/" .. i .. "=" .. toURL(v) .. "&"
                 end
-                queryURL = queryURL .. tostring(value[#value])
             else
-                queryURL = queryURL .. tostring(value)
+                queryURL = queryURL .. field .. "=" .. toURL(value) .. "&"
             end
-            queryURL = queryURL .. "&"
         end
 
         return newURL .. queryURL .. self.Auth
     end
 
-    print("[TrelloEntity.new]: Successfully authenticated as " .. TrelloEntity.User .. ". Welcome!")
+    if token and token ~= "" then
+        print("[TrelloEntity.new]: Successfully authenticated as " .. TrelloEntity.User .. ". Welcome!")
+    else
+        print("[TrelloEntity.new]: Added new userless entity.")
+        warn("[TrelloEntity.new]: This entity can only read public boards.")
+    end
     return setmetatable(TrelloEntity, META_TrelloEntity)
 end
 
