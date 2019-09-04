@@ -92,14 +92,57 @@ makeBoard = function(entity, data)
         return nil
     end
 
-    local TrelloBoard = {}
+    local TrelloBoard = {
+        RemoteId = data.id,
+        Name = data.name,
+        Description = data.desc,
+        Public = data.prefs.permissionLevel == "public",
+        Closed = data.closed,
+        _Remote = {
+            Name = data.name,
+            Description = data.desc,
+            Public = data.prefs.permissionLevel == "public",
+            Closed = data.closed
+        }
+    }
 
-    TrelloBoard.Name = data.name
-    TrelloBoard.LocalId = ""
-    TrelloBoard.RemoteId = data.id
-    TrelloBoard.Public = data.prefs.permissionLevel == "public"
-    TrelloBoard.Closed = data.closed
-    TrelloBoard._Git = {}
+    --[[**
+        Pushes all metadata changes to Trello. (Doesn't apply to lists, cards, etc.)
+
+        @param [t:Boolean] force Whether to push all changes to the board even though nothing has been changed.
+
+        @returns [t:Void]
+    **--]]
+    function TrelloBoard:Commit(force)
+        local count = 0
+        local commit = {}
+
+        for i, v in pairs (TrelloBoard._Remote) do
+            if (v ~= TrelloBoard[i]) or force then
+                commit[i] = TrelloBoard[i]
+                count = count + 1
+            end
+        end
+
+        if count == 0 then
+            warn("[Trello/Board.Commit]: Nothing to change. Skipping")
+        end
+
+        local commitURL = entity:MakeURL("/boards/"..TrelloBoard.RemoteId, {
+            name = commit.Name,
+            desc = commit.Description,
+            closed = commit.Closed,
+            prefs = (commit.Public ~= nil) and {
+                permissionLevel = commit.Public and "public" or "private"
+            } or nil
+        })
+
+        HTTP.RequestInsist(commitURL, HTTP.HttpMethod.PUT, "{}", true)
+
+        for i, v in pairs(commit) do
+            TrelloBoard._Remote[i] = v
+        end
+    end
 
     --[[**
         Deletes this board from Trello. All garbage collection is up to the developer to perform.
@@ -110,6 +153,8 @@ makeBoard = function(entity, data)
         local commitURL = entity:MakeURL("/boards/" .. TrelloBoard.RemoteId)
 
         HTTP.RequestInsist(commitURL, HTTP.HttpMethod.DELETE, nil, true)
+
+        TrelloBoard = nil
     end
 
     return setmetatable(TrelloBoard, META_TrelloBoard)

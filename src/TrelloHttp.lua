@@ -7,6 +7,7 @@
 --]]
 
 local http = game:GetService("HttpService")
+local MAX_TRIES = 30
 
 --[[**
     Enum HttpMethod:
@@ -87,7 +88,7 @@ end
 local function RequestInsist(url, method, body, pedantic_assert)
     local tries = 0
 
-    while tries <= 30 do
+    while tries <= MAX_TRIES do
         local content = Request(url, method, body)
         tries = tries + 1
 
