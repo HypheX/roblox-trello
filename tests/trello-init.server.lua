@@ -7,7 +7,6 @@
 --]]
 
 local Trello = require(game.ServerScriptService.Trello)
-local TrelloHttp = require(game.ServerScriptService.Trello.TrelloHttp)
 local TrelloClass = require(game.ServerScriptService.Trello.TrelloClass)
 
 wait(2)
@@ -39,7 +38,7 @@ wait(3)
 print("Editing.")
 print(boardIWillEdit.RemoteId)
 
-boardIWillEdit.Name = "Maybe this instead."
+boardIWillEdit.Name = "Maybe this name is cooler!"
 boardIWillEdit.Description = "Hey, what about we oof?"
 boardIWillEdit.Public = true
 print("Changing name and description, making it public.")
