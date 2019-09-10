@@ -19,7 +19,6 @@
 --]]
 
 local Trello = require(game.ServerScriptService.Trello)
-local TrelloClass = require(game.ServerScriptService.Trello.TrelloClass)
 
 wait(2)
 
@@ -28,14 +27,14 @@ wait(2)
 -----------------------------------------------------
 local id = Trello.new("API KEY", "API TOKEN")
 
-local board1 = TrelloClass.Board.new(id, "My Awesome Private Board")
+local board1 = Trello.Board.new(id, "My Awesome Private Board")
 print(board1.RemoteId)
-local board2 = TrelloClass.Board.new(id, "My Awesome Explicit Private Board", false)
+local board2 = Trello.Board.new(id, "My Awesome Explicit Private Board", false)
 print(board2.RemoteId)
-local board3 = TrelloClass.Board.new(id, "My Awesome Public Board", true)
+local board3 = Trello.Board.new(id, "My Awesome Public Board", true)
 print(board3.RemoteId)
 
-local myAwesomeBoard = TrelloClass.Board.fromRemote(id, board1.RemoteId)
+local myAwesomeBoard = Trello.Board.fromRemote(id, board1.RemoteId)
 for i, v in pairs(myAwesomeBoard) do
     print(i .. ": ".. tostring(v))
 end
@@ -44,7 +43,7 @@ board1:Delete()
 board2:Delete()
 board3:Delete()
 
-boardIWillEdit = TrelloClass.Board.new(id, "This")
+boardIWillEdit = Trello.Board.new(id, "This")
 print("Waiting 3 seconds until starting to edit...")
 wait(3)
 print("Editing.")
