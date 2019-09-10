@@ -19,7 +19,7 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.6"
+local VERSION = "2.0.0-dev.7"
 local HTTP = require(script.TrelloHttp)
 local CLASS = require(script.TrelloClass)
 
@@ -166,4 +166,6 @@ function TrelloEntity.new(key, token, pedantic_assert)
 end
 
 warn("Using Roblox-Trello, VERSION " .. VERSION .. ".")
-return TrelloEntity
+
+CLASS.TrelloEntity = TrelloEntity
+return CLASS
