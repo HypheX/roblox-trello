@@ -43,7 +43,7 @@ board1:Delete()
 board2:Delete()
 board3:Delete()
 
-boardIWillEdit = Trello.Board.new(id, "This")
+local boardIWillEdit = Trello.Board.new(id, "This")
 print("Waiting 3 seconds until starting to edit...")
 wait(3)
 print("Editing.")

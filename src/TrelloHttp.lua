@@ -52,7 +52,7 @@ local function Request(url, method, body)
         Body = body,
     }
 
-    if (method == HttpMethod.GET or method == HttpMethod.HEAD or method == HttpMethod.DELETE) and body then
+    if method == HttpMethod.GET or method == HttpMethod.HEAD or method == HttpMethod.DELETE and body then
         -- While the DELETE method actually accepts a body, it is ignored, so it's best to leave it empty.
         requestBody.Body = nil
         warn("[Trello/HTTP.Request]: Tried to send a payload with an invalid method (" .. method .. ").")
@@ -130,8 +130,14 @@ local function RequestInsist(url, method, body, pedantic_assert)
     error("[Trello/HTTP.RequestInsist]: PANIC - Maximum amount of tries for request exceeded. Giving up.", 3)
 end
 
-return 
-    {
-        HttpMethod = HttpMethod, Request = Request, RequestInsist = RequestInsist,
-        JSONEncode = function(x) return http:JSONEncode(x) end, JSONDecode = function(x) return http:JSONDecode(x) end
-    }
+return {
+    HttpMethod = HttpMethod,
+    Request = Request,
+    RequestInsist = RequestInsist,
+    JSONEncode = function(x)
+        return http:JSONEncode(x)
+    end,
+    JSONDecode = function(x)
+        return http:JSONDecode(x)
+    end
+}
