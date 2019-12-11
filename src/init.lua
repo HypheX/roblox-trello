@@ -19,7 +19,7 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.7"
+local VERSION = "2.0.0-dev.8"
 local HTTP = require(script.TrelloHttp)
 local CLASS = require(script.TrelloClass)
 
