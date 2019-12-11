@@ -111,7 +111,7 @@ function TrelloBoard.fetchAllFrom(entity)
     end
 
     local commitURL = entity:MakeURL("/members/me/boards", {
-        filter = "all",
+        filter = "open",
         fields = {"name","desc","descData","closed","prefs"},
         lists = "all",
         memberships = "none",
