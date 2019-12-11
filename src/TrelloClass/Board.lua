@@ -98,6 +98,36 @@ function TrelloBoard.fromRemote(entity, remoteId)
     return makeBoard(entity, result.Body)
 end
 
+--[[**
+    Fetches all the boards the provided entity has edit access to.
+
+    @param [t:TrelloEntity] entity The entity where to fetch the boards from.
+
+    @returns [t:Array<TrelloBoard>] An array containing zero or more trello boards.
+**--]]
+function TrelloBoard.fetchAllFrom(entity)
+    if not entity or getmetatable(entity) ~= "TrelloEntity" then
+        error("[TrelloBoard.fromRemote]: Invalid entity!", 0)
+    end
+
+    local commitURL = entity:MakeURL("/members/me/boards", {
+        filter = "all",
+        fields = {"name","desc","descData","closed","prefs"},
+        lists = true,
+        memberships = "none",
+        organization = false,
+        organization_fields = ""
+    })
+
+    local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
+    local body = result.Body
+    local boards = {}
+
+    for _, b in pairs(body) do
+        table.insert(boards, makeBoard(entity, b))
+    end
+end
+
 -- Prototype implementation
 makeBoard = function(entity, data)
     if not data then
