@@ -113,11 +113,13 @@ function TrelloBoard.fetchAllFrom(entity)
     local commitURL = entity:MakeURL("/members/me/boards", {
         filter = "all",
         fields = {"name","desc","descData","closed","prefs"},
-        lists = true,
+        lists = "all",
         memberships = "none",
         organization = false,
         organization_fields = ""
     })
+
+    print(commitURL)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
     local body = result.Body
@@ -126,6 +128,8 @@ function TrelloBoard.fetchAllFrom(entity)
     for _, b in pairs(body) do
         table.insert(boards, makeBoard(entity, b))
     end
+
+    return boards
 end
 
 -- Prototype implementation
