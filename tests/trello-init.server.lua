@@ -27,7 +27,7 @@ wait(2)
 -- API KEY: https://trello.com/app-key --------------
 -- GENERATE API TOKEN: https://trello.com/1/authorize?expiration=never&name=Roblox%20Trello&scope=read,write&response_type=token&key={YourAPIKey}
 -----------------------------------------------------
-local id = Trello.new("API KEY", "API TOKEN")
+local id = Trello.Entity.new("API KEY", "API TOKEN")
 
 local board1 = Trello.Board.new(id, "My Awesome Private Board")
 print(board1.RemoteId)
@@ -81,5 +81,17 @@ boardIWillEdit:Delete()
 
 -- Was also board1, should return a 404.
 myAwesomeBoard:Delete()
+
+-- Test fetching all boards
+wait(3)
+
+local boards = Trello.Board.fetchAllFrom(id)
+
+for i, v in pairs (boards) do
+    warn("Board " .. tostring(i))
+    for bin, bval in pairs (v) do
+        print(tostring(bin).." = "..tostring(bval))
+    end
+end
 
 warn("TEST END.")

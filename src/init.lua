@@ -143,7 +143,7 @@ function TrelloEntity.new(key, token, pedantic_assert)
                 error("[TrelloEntity.MakeURL]: query_fields must to be a dictionary and all indexes must to be strings!", 0)
             end
 
-            if type(value) == "table" and not value[0] then
+            if type(value) == "table" and not value[1] then
                 -- This is a dictionary
                 for i, v in pairs(value) do
                     queryURL = queryURL .. field .. "/" .. i .. "=" .. toURL(v) .. "&"
