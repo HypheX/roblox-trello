@@ -24,6 +24,8 @@ wait(2)
 
 -----------------------------------------------------
 -- MAKE SURE TO CHANGE THESE WITH YOUR OWN VALUES! --
+-- API KEY: https://trello.com/app-key --------------
+-- GENERATE API TOKEN: https://trello.com/1/authorize?expiration=never&name=Roblox%20Trello&scope=read,write&response_type=token&key={YourAPIKey}
 -----------------------------------------------------
 local id = Trello.new("API KEY", "API TOKEN")
 
