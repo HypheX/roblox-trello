@@ -159,8 +159,8 @@ function TrelloClient.new(key, token, pedantic_assert)
     if token and token ~= "" then
         print("[TrelloClient.new]: Successfully authenticated as " .. trelloClient.User .. ". Welcome!")
     else
-        print("[TrelloClient.new]: Added new userless entity.")
-        warn("[TrelloClient.new]: This entity can only read public boards.")
+        print("[TrelloClient.new]: Added new userless client.")
+        warn("[TrelloClient.new]: This client can only read public boards.")
     end
     return setmetatable(trelloClient, TrelloClientMeta)
 end
