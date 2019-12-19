@@ -45,20 +45,20 @@ local TrelloBoard = {}
 --[[**
     Creates a new TrelloBoard, that represents a Trello board, that is then also created on Trello.
 
-    @param [t:TrelloClient] entity The entity the board will be assigned to.
+    @param [t:TrelloClient] client The client the board will be assigned to.
     @param [t:String] name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
     @param [t:Boolean] public Whether the board is public or not. If this field is not provided, the board will be private.
 
     @returns [t:TrelloBoard] A new TrelloBoard that was freshly created.
 **--]]
-function TrelloBoard.new(entity, name, public)
-    if not entity or getmetatable(entity) ~= "TrelloClient" then
+function TrelloBoard.new(client, name, public)
+    if not client or getmetatable(client) ~= "TrelloClient" then
         error("[TrelloBoard.new]: Invalid client!", 0)
     elseif not name or name == "" or name:len() > 16384 then
         error("[TrelloBoard.new]: Invalid name! Make sure that the name is a non-empty string with less than 16384 characters.", 0)
     end
 
-    local commitURL = entity:MakeURL("/boards", {
+    local commitURL = client:MakeURL("/boards", {
         name = name,
         defaultLabels = false,
         defaultLists = false,
@@ -69,25 +69,25 @@ function TrelloBoard.new(entity, name, public)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.POST, "{}", true)
 
-    return makeBoard(entity, result.Body)
+    return makeBoard(client, result.Body)
 end
 
 --[[**
     Fetches a TrelloBoard from Trello.
 
-    @param [t:TrelloClient] entity The entity the board will be assigned to.
+    @param [t:TrelloClient] client The client the board will be assigned to.
     @param [t:String] name The Board's ID.
 
     @returns [t:Variant<TrelloBoard,nil>] The Trello Board fetched. Returns nil if the board doesn't exist.
 **--]]
-function TrelloBoard.fromRemote(entity, remoteId)
-    if not entity or getmetatable(entity) ~= "TrelloClient" then
-        error("[TrelloBoard.fromRemote]: Invalid entity!", 0)
+function TrelloBoard.fromRemote(client, remoteId)
+    if not client or getmetatable(client) ~= "TrelloClient" then
+        error("[TrelloBoard.fromRemote]: Invalid client!", 0)
     elseif not remoteId or remoteId == "" then
         error("[TrelloBoard.fromRemote]: Invalid board id!", 0)
     end
 
-    local commitURL = entity:MakeURL("/boards/" .. remoteId, {
+    local commitURL = client:MakeURL("/boards/" .. remoteId, {
         customFields = false,
         card_pluginData = false,
         fields = {"name","desc","descData","closed","prefs"},
@@ -95,22 +95,22 @@ function TrelloBoard.fromRemote(entity, remoteId)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
 
-    return makeBoard(entity, result.Body)
+    return makeBoard(client, result.Body)
 end
 
 --[[**
-    Fetches all the boards the provided entity has edit access to.
+    Fetches all the boards the provided client has edit access to.
 
-    @param [t:TrelloClient] entity The entity where to fetch the boards from.
+    @param [t:TrelloClient] client The client where to fetch the boards from.
 
     @returns [t:Array<TrelloBoard>] An array containing zero or more trello boards.
 **--]]
-function TrelloBoard.fetchAllFrom(entity)
-    if not entity or getmetatable(entity) ~= "TrelloClient" then
-        error("[TrelloBoard.fromRemote]: Invalid entity!", 0)
+function TrelloBoard.fetchAllFrom(client)
+    if not client or getmetatable(client) ~= "TrelloClient" then
+        error("[TrelloBoard.fromRemote]: Invalid client!", 0)
     end
 
-    local commitURL = entity:MakeURL("/members/me/boards", {
+    local commitURL = client:MakeURL("/members/me/boards", {
         filter = "open",
         fields = {"name","desc","descData","closed","prefs"},
         lists = "all",
@@ -126,14 +126,14 @@ function TrelloBoard.fetchAllFrom(entity)
     local boards = {}
 
     for _, b in pairs(body) do
-        table.insert(boards, makeBoard(entity, b))
+        table.insert(boards, makeBoard(client, b))
     end
 
     return boards
 end
 
 -- Prototype implementation
-makeBoard = function(entity, data)
+makeBoard = function(client, data)
     if not data then
         return nil
     end
@@ -174,7 +174,7 @@ makeBoard = function(entity, data)
             warn("[Trello/Board.Commit]: Nothing to change. Skipping")
         end
 
-        local commitURL = entity:MakeURL("/boards/"..self.RemoteId, {
+        local commitURL = client:MakeURL("/boards/"..self.RemoteId, {
             name = commit.Name,
             desc = commit.Description,
             closed = commit.Closed,
@@ -196,7 +196,7 @@ makeBoard = function(entity, data)
         @returns [t:Void]
     **--]]
     function trelloBoard:Delete()
-        local commitURL = entity:MakeURL("/boards/" .. self.RemoteId)
+        local commitURL = client:MakeURL("/boards/" .. self.RemoteId)
 
         HTTP.RequestInsist(commitURL, HTTP.HttpMethod.DELETE, nil, true)
 
