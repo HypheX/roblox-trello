@@ -19,28 +19,28 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.8"
+local VERSION = "2.0.0-dev.9"
 local HTTP = require(script.TrelloHttp)
 local CLASS = require(script.TrelloClass)
 
--- TrelloEntity Metatable
-local TrelloEntityMeta = {
-    __tostring = "TrelloEntity",
+-- TrelloClient Metatable
+local TrelloClientMeta = {
+    __tostring = "TrelloClient",
 
-    __metatable = "TrelloEntity",
+    __metatable = "TrelloClient",
 
     -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware.
     __index = function(_, index)
-        error("[TrelloEntity]: Attempted to index non-existant property "..tostring(index)..".", 0)
+        error("[TrelloClient]: Attempted to index non-existant property "..tostring(index)..".", 0)
     end,
 
     -- This can be bypassed using rawset, but at that point it's not on us
     __newindex = function(_, index, _)
-        error("[TrelloEntity]: Attempted to set non-existant property "..tostring(index)..".", 0)
+        error("[TrelloClient]: Attempted to set non-existant property "..tostring(index)..".", 0)
     end
 }
 
-local TrelloEntity = {}
+local TrelloClient = {}
 local function toURL(value)
     local returns = ""
 
@@ -55,17 +55,17 @@ local function toURL(value)
 end
 
 --[[**
-    Creates a new TrelloEntity, that represents a Trello account.
+    Creates a new TrelloClient, that represents a Trello account.
 
     @param [t:String] key Your developer key. Cannot be empty or nil.
     @param [t:Variant<String,nil>] token Your developer token. Optional if you're only READING from a PUBLIC board.
     @param [t:Boolean] pedantic_assert Whether an error should be thrown (instead of a warning) if key validation fails.
 
-    @returns [t:Variant<TrelloEntity,nil>] A new TrelloEntity, representing your account. Returns nil if key validation fails (with pedantic_assert disabled).
+    @returns [t:Variant<TrelloClient,nil>] A new TrelloClient, representing your account. Returns nil if key validation fails (with pedantic_assert disabled).
 **--]]
-function TrelloEntity.new(key, token, pedantic_assert)
+function TrelloClient.new(key, token, pedantic_assert)
     if not key or key == "" then
-        error("[TrelloEntity.new]: You need a key to authenticate yourself!", 0)
+        error("[TrelloClient.new]: You need a key to authenticate yourself!", 0)
     end
 
     local AUTH_STR = "key="..key..((token and token ~= "") and "&token="..token or "")
@@ -81,33 +81,33 @@ function TrelloEntity.new(key, token, pedantic_assert)
     end
 
     if not dummyRequest.LuaSuccess then
-        error("[TrelloEntity.new]: Fatal Error has been thrown by HttpService (" .. dummyRequest.SystemResponse .. ").", 0)
+        error("[TrelloClient.new]: Fatal Error has been thrown by HttpService (" .. dummyRequest.SystemResponse .. ").", 0)
     else
-        print("[TrelloEntity.new]: Measured Latency: " .. tostring(math.ceil(dummyRequest.Latency*1000)) .. "ms.")
+        print("[TrelloClient.new]: Measured Latency: " .. tostring(math.ceil(dummyRequest.Latency*1000)) .. "ms.")
         for _,l in pairs ({5, 3, 2, 1, 0.5}) do
             if dummyRequest.Latency >= l then
-                warn("[TrelloEntity.new]: API Latency is higher than " .. tostring(l*1000) .. "ms!")
+                warn("[TrelloClient.new]: API Latency is higher than " .. tostring(l*1000) .. "ms!")
                 break
             end
         end
 
         if dummyRequest.StatusCode == 200 then
-            print("[TrelloEntity.new]: All OK.")
+            print("[TrelloClient.new]: All OK.")
         elseif dummyRequest.StatusCode >= 500 then
-            warn("[TrelloEntity.new]: Bad Server Response - " .. tostring(dummyRequest.StatusCode) .. ". Service might be experiencing issues.")
+            warn("[TrelloClient.new]: Bad Server Response - " .. tostring(dummyRequest.StatusCode) .. ". Service might be experiencing issues.")
         elseif dummyRequest.StatusCode >= 400 then
             if pedantic_assert then
-                error("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!", 0)
+                error("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!", 0)
             end
-            warn("[TrelloEntity.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
+            warn("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
             return nil
         end
     end
 
-    -- All tests passed, we can make the TrelloEntity.
-    local trelloEntity = {}
-    trelloEntity.Auth = AUTH_STR
-    trelloEntity.User = dummyRequest.Body.fullName
+    -- All tests passed, we can make the TrelloClient.
+    local trelloClient = {}
+    trelloClient.Auth = AUTH_STR
+    trelloClient.User = dummyRequest.Body.fullName
 
     --[[**
         Creates a syntactically correct URL for use within the module. Authentication is automatically appended.
@@ -117,9 +117,9 @@ function TrelloEntity.new(key, token, pedantic_assert)
 
         @returns [t:String] A URL string you can make requests to.
     **--]]
-    function trelloEntity:MakeURL(page, query_fields)
+    function trelloClient:MakeURL(page, query_fields)
         if not page or page == "" then
-            error("[TrelloEntity.MakeURL]: Page argument is empty!", 0)
+            error("[TrelloClient.MakeURL]: Page argument is empty!", 0)
         end
 
         local newURL = "https://api.trello.com/1/"
@@ -140,7 +140,7 @@ function TrelloEntity.new(key, token, pedantic_assert)
         local queryURL = "?"
         for field, value in pairs (query_fields) do
             if type(field) ~= "string" then
-                error("[TrelloEntity.MakeURL]: query_fields must to be a dictionary and all indexes must to be strings!", 0)
+                error("[TrelloClient.MakeURL]: query_fields must to be a dictionary and all indexes must to be strings!", 0)
             end
 
             if type(value) == "table" and not value[1] then
@@ -157,15 +157,15 @@ function TrelloEntity.new(key, token, pedantic_assert)
     end
 
     if token and token ~= "" then
-        print("[TrelloEntity.new]: Successfully authenticated as " .. trelloEntity.User .. ". Welcome!")
+        print("[TrelloClient.new]: Successfully authenticated as " .. trelloClient.User .. ". Welcome!")
     else
-        print("[TrelloEntity.new]: Added new userless entity.")
-        warn("[TrelloEntity.new]: This entity can only read public boards.")
+        print("[TrelloClient.new]: Added new userless entity.")
+        warn("[TrelloClient.new]: This entity can only read public boards.")
     end
-    return setmetatable(trelloEntity, TrelloEntityMeta)
+    return setmetatable(trelloClient, TrelloClientMeta)
 end
 
 warn("Using Roblox-Trello, VERSION " .. VERSION .. ".")
 
-CLASS.Entity = TrelloEntity
+CLASS.Client = TrelloClient
 return CLASS

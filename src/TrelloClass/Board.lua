@@ -45,15 +45,15 @@ local TrelloBoard = {}
 --[[**
     Creates a new TrelloBoard, that represents a Trello board, that is then also created on Trello.
 
-    @param [t:TrelloEntity] entity The entity the board will be assigned to.
+    @param [t:TrelloClient] entity The entity the board will be assigned to.
     @param [t:String] name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
     @param [t:Boolean] public Whether the board is public or not. If this field is not provided, the board will be private.
 
     @returns [t:TrelloBoard] A new TrelloBoard that was freshly created.
 **--]]
 function TrelloBoard.new(entity, name, public)
-    if not entity or getmetatable(entity) ~= "TrelloEntity" then
-        error("[TrelloBoard.new]: Invalid entity!", 0)
+    if not entity or getmetatable(entity) ~= "TrelloClient" then
+        error("[TrelloBoard.new]: Invalid client!", 0)
     elseif not name or name == "" or name:len() > 16384 then
         error("[TrelloBoard.new]: Invalid name! Make sure that the name is a non-empty string with less than 16384 characters.", 0)
     end
@@ -75,13 +75,13 @@ end
 --[[**
     Fetches a TrelloBoard from Trello.
 
-    @param [t:TrelloEntity] entity The entity the board will be assigned to.
+    @param [t:TrelloClient] entity The entity the board will be assigned to.
     @param [t:String] name The Board's ID.
 
     @returns [t:Variant<TrelloBoard,nil>] The Trello Board fetched. Returns nil if the board doesn't exist.
 **--]]
 function TrelloBoard.fromRemote(entity, remoteId)
-    if not entity or getmetatable(entity) ~= "TrelloEntity" then
+    if not entity or getmetatable(entity) ~= "TrelloClient" then
         error("[TrelloBoard.fromRemote]: Invalid entity!", 0)
     elseif not remoteId or remoteId == "" then
         error("[TrelloBoard.fromRemote]: Invalid board id!", 0)
@@ -101,12 +101,12 @@ end
 --[[**
     Fetches all the boards the provided entity has edit access to.
 
-    @param [t:TrelloEntity] entity The entity where to fetch the boards from.
+    @param [t:TrelloClient] entity The entity where to fetch the boards from.
 
     @returns [t:Array<TrelloBoard>] An array containing zero or more trello boards.
 **--]]
 function TrelloBoard.fetchAllFrom(entity)
-    if not entity or getmetatable(entity) ~= "TrelloEntity" then
+    if not entity or getmetatable(entity) ~= "TrelloClient" then
         error("[TrelloBoard.fromRemote]: Invalid entity!", 0)
     end
 
