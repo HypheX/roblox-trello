@@ -27,7 +27,7 @@ wait(2)
 -- API KEY: https://trello.com/app-key --------------
 -- GENERATE API TOKEN: https://trello.com/1/authorize?expiration=never&name=Roblox%20Trello&scope=read,write&response_type=token&key={YourAPIKey}
 -----------------------------------------------------
-local id = Trello.Entity.new("API KEY", "API TOKEN")
+local id = Trello.Client.new("KEY", "TOKEN")
 
 local board1 = Trello.Board.new(id, "My Awesome Private Board")
 print(board1.RemoteId)
