@@ -18,7 +18,6 @@
     all copies or substantial portions of the Software.
 --]]
 
--- Module Global Version
 local HTTP = require(script.Parent.Parent.TrelloHttp)
 
 -- TrelloClient Metatable
@@ -66,6 +65,8 @@ function TrelloClient.new(key, token, errorOnFailure)
         error("[TrelloClient.new]: You need a key to authenticate yourself!", 0)
     end
 
+    local fail = errorOnFailure and error or warn
+
     local AUTH_STR = "key="..key..((token and token ~= "") and "&token="..token or "")
 
     -- Perform authentication validation and assertation
@@ -92,12 +93,10 @@ function TrelloClient.new(key, token, errorOnFailure)
         if dummyRequest.StatusCode == 200 then
             print("[TrelloClient.new]: All OK.")
         elseif dummyRequest.StatusCode >= 500 then
-            warn("[TrelloClient.new]: Bad Server Response - " .. tostring(dummyRequest.StatusCode) .. ". Service might be experiencing issues.")
+            fail("[TrelloClient.new]: Bad Server Response - " .. tostring(dummyRequest.StatusCode) .. ". Service might be experiencing issues.")
+            return nil
         elseif dummyRequest.StatusCode >= 400 then
-            if errorOnFailure then
-                error("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!", 0)
-            end
-            warn("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
+            fail("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
             return nil
         end
     end
