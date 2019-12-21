@@ -19,9 +19,12 @@
 --]]
 
 local CLASS = {}
+local VERSION = "2.0.0-dev.10"
 
-for _, c in pairs(script:GetChildren()) do
-    CLASS[c.Name] = require(c)
+for _, c in pairs(script.TrelloClass:GetChildren()) do
+    CLASS[c.Name] = require(c).Public
 end
+
+warn("Using Roblox-Trello, VERSION " .. VERSION .. ".")
 
 return CLASS
