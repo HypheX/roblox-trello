@@ -59,11 +59,11 @@ end
 
     @param [t:String] key Your developer key. Cannot be empty or nil.
     @param [t:Variant<String,nil>] token Your developer token. Optional if you're only READING from a PUBLIC board.
-    @param [t:Boolean] pedantic_assert Whether an error should be thrown (instead of a warning) if key validation fails.
+    @param [t:Boolean] errorOnFailure Whether an error should be thrown (instead of a warning) if key validation fails.
 
-    @returns [t:Variant<TrelloClient,nil>] A new TrelloClient, representing your account. Returns nil if key validation fails (with pedantic_assert disabled).
+    @returns [t:Variant<TrelloClient,nil>] A new TrelloClient, representing your account. Returns nil if key validation fails (with errorOnFailure disabled).
 **--]]
-function TrelloClient.new(key, token, pedantic_assert)
+function TrelloClient.new(key, token, errorOnFailure)
     if not key or key == "" then
         error("[TrelloClient.new]: You need a key to authenticate yourself!", 0)
     end
@@ -96,7 +96,7 @@ function TrelloClient.new(key, token, pedantic_assert)
         elseif dummyRequest.StatusCode >= 500 then
             warn("[TrelloClient.new]: Bad Server Response - " .. tostring(dummyRequest.StatusCode) .. ". Service might be experiencing issues.")
         elseif dummyRequest.StatusCode >= 400 then
-            if pedantic_assert then
+            if errorOnFailure then
                 error("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!", 0)
             end
             warn("[TrelloClient.new]: Bad Client Request - " .. tostring(dummyRequest.StatusCode) .. ". Check your authentication keys!")
