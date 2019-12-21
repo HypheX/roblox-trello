@@ -19,9 +19,7 @@
 --]]
 
 -- Module Global Version
-local VERSION = "2.0.0-dev.10"
-local HTTP = require(script.TrelloHttp)
-local CLASS = require(script.TrelloClass)
+local HTTP = require(script.Parent.Parent.TrelloHttp)
 
 -- TrelloClient Metatable
 local TrelloClientMeta = {
@@ -165,7 +163,4 @@ function TrelloClient.new(key, token, errorOnFailure)
     return setmetatable(trelloClient, TrelloClientMeta)
 end
 
-warn("Using Roblox-Trello, VERSION " .. VERSION .. ".")
-
-CLASS.Client = TrelloClient
-return CLASS
+return {Public = TrelloClient}

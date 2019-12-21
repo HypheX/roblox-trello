@@ -206,4 +206,4 @@ makeBoard = function(client, data)
     return setmetatable(trelloBoard, TrelloBoardMeta)
 end
 
-return TrelloBoard
+return {Public = TrelloBoard, Make = makeBoard}
