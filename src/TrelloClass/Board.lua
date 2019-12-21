@@ -43,15 +43,15 @@ local makeBoard
 local TrelloBoard = {}
 
 --[[**
-    Creates a new TrelloBoard, that represents a Trello board, that is then also created on Trello.
+    Creates a new board, that is then also created on Trello.
 
-    @param [t:TrelloClient] client The client the board will be assigned to.
     @param [t:String] name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
     @param [t:Boolean] public Whether the board is public or not. If this field is not provided, the board will be private.
+    @param [t:TrelloClient] client The client the board will be assigned to.
 
     @returns [t:TrelloBoard] A new TrelloBoard that was freshly created.
 **--]]
-function TrelloBoard.new(client, name, public)
+function TrelloBoard.new(name, public, client)
     if not client or getmetatable(client) ~= "TrelloClient" then
         error("[TrelloBoard.new]: Invalid client!", 0)
     elseif not name or name == "" or name:len() > 16384 then
@@ -75,12 +75,12 @@ end
 --[[**
     Fetches a TrelloBoard from Trello.
 
-    @param [t:TrelloClient] client The client the board will be assigned to.
     @param [t:String] name The Board's ID.
+    @param [t:TrelloClient] client The client the board will be assigned to.
 
     @returns [t:Variant<TrelloBoard,nil>] The Trello Board fetched. Returns nil if the board doesn't exist.
 **--]]
-function TrelloBoard.fromRemote(client, remoteId)
+function TrelloBoard.fromRemote(remoteId, client)
     if not client or getmetatable(client) ~= "TrelloClient" then
         error("[TrelloBoard.fromRemote]: Invalid client!", 0)
     elseif not remoteId or remoteId == "" then
