@@ -27,25 +27,22 @@ wait(2)
 -- API KEY: https://trello.com/app-key --------------
 -- GENERATE API TOKEN: https://trello.com/1/authorize?expiration=never&name=Roblox%20Trello&scope=read,write&response_type=token&key={YourAPIKey}
 -----------------------------------------------------
-local id = Trello.Client.new("KEY", "TOKEN")
+local id = Trello.Client.new("d31703e3e5ea5587ca5800f86e407182", "3d1ca0af245d02941d32acf8c4bc6f1075aada1f459522069d67bb59008982f9", true)
 
-local board1 = Trello.Board.new(id, "My Awesome Private Board")
+local board1 = Trello.Board.new("My Awesome Private Board", false, id)
 print(board1.RemoteId)
-local board2 = Trello.Board.new(id, "My Awesome Explicit Private Board", false)
+local board2 = Trello.Board.new("My Awesome Public Board", true, id)
 print(board2.RemoteId)
-local board3 = Trello.Board.new(id, "My Awesome Public Board", true)
-print(board3.RemoteId)
 
-local myAwesomeBoard = Trello.Board.fromRemote(id, board1.RemoteId)
+local myAwesomeBoard = Trello.Board.fromRemote(board1.RemoteId, id)
 for i, v in pairs(myAwesomeBoard) do
     print(i .. ": ".. tostring(v))
 end
 
 board1:Delete()
 board2:Delete()
-board3:Delete()
 
-local boardIWillEdit = Trello.Board.new(id, "This")
+local boardIWillEdit = Trello.Board.new("This", nil, id)
 print("Waiting 3 seconds until starting to edit...")
 wait(3)
 print("Editing.")
