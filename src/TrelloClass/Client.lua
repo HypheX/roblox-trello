@@ -2,7 +2,7 @@
     Name: init.lua
     From roblox-trello v2
 
-    Description: Front-Ends for Trello Entity management
+    Description: Constructor for Trello clients
 
 
     Copyright (c) 2019 Luis, David Duque
@@ -19,6 +19,7 @@
 --]]
 
 local HTTP = require(script.Parent.Parent.TrelloHttp)
+local Board = require(script.Parent.Board)
 
 -- TrelloClient Metatable
 local TrelloClientMeta = {
@@ -68,6 +69,7 @@ function TrelloClient.new(key, token, errorOnFailure)
     local fail = errorOnFailure and error or warn
 
     local AUTH_STR = "key="..key..((token and token ~= "") and "&token="..token or "")
+    local userless = false
 
     -- Perform authentication validation and assertation
     print("https://api.trello.com/1/members/me?" .. AUTH_STR)
@@ -75,6 +77,7 @@ function TrelloClient.new(key, token, errorOnFailure)
     if token and token ~= "" then
         dummyRequest = HTTP.Request("https://api.trello.com/1/members/me?" .. AUTH_STR, HTTP.HttpMethod.GET)
     else
+        userless = true
         -- We don't have a particular user authenticated, so we'll resort to this - a public board.
         dummyRequest = HTTP.Request("https://api.trello.com/1/boards/5d6f8ec6764c2112a27e3d12?" .. AUTH_STR, HTTP.HttpMethod.GET)
     end
@@ -102,9 +105,10 @@ function TrelloClient.new(key, token, errorOnFailure)
     end
 
     -- All tests passed, we can make the TrelloClient.
+    local localBoards = {}
     local trelloClient = {}
     trelloClient.Auth = AUTH_STR
-    trelloClient.User = dummyRequest.Body.fullName
+    trelloClient.User = dummyRequest.Body.fullName or ""
 
     --[[**
         Creates a syntactically correct URL for use within the module. Authentication is automatically appended.
@@ -153,11 +157,26 @@ function TrelloClient.new(key, token, errorOnFailure)
         return newURL .. queryURL .. self.Auth
     end
 
-    if token and token ~= "" then
-        print("[TrelloClient.new]: Successfully authenticated as " .. trelloClient.User .. ". Welcome!")
-    else
+    if userless then
         print("[TrelloClient.new]: Added new userless client.")
         warn("[TrelloClient.new]: This client can only read public boards.")
+    else
+        print("[TrelloClient.new]: Successfully authenticated as " .. trelloClient.User .. ". Welcome!")
+        -- Fetch user's boards
+        local fetchUrl = trelloClient:MakeURL("/members/me/boards", {
+            filter = "all",
+            fields = {"id", "name", "descData", "closed"},
+            lists = "none",
+            memberships = "none",
+            organization = false
+        })
+
+        local boards = HTTP.RequestInsist(fetchUrl, HTTP.HttpMethod.GET, nil, true)
+
+        for b in pairs(boards) do
+            localBoards[b.id] = Board.Make(b)
+        end
+
     end
     return setmetatable(trelloClient, TrelloClientMeta)
 end
