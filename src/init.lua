@@ -2,7 +2,7 @@
     Name: TrelloClass.lua
     From roblox-trello v2
 
-    Description: Fetches class constructors for Trello.
+    Description: Fetches and groups class constructors for Trello.
 
 
     Copyright (c) 2019 Luis, David Duque
