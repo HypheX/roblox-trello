@@ -138,18 +138,19 @@ makeBoard = function(client, data)
         return nil
     end
 
+    local tracking = {
+        Name = data.name,
+        Description = data.desc,
+        Public = data.prefs.permissionLevel == "public",
+        Closed = data.closed
+    }
+
     local trelloBoard = {
         RemoteId = data.id,
         Name = data.name,
         Description = data.desc,
         Public = data.prefs.permissionLevel == "public",
         Closed = data.closed,
-        _Remote = {
-            Name = data.name,
-            Description = data.desc,
-            Public = data.prefs.permissionLevel == "public",
-            Closed = data.closed
-        }
     }
 
     --[[**
@@ -159,11 +160,11 @@ makeBoard = function(client, data)
 
         @returns [t:Void]
     **--]]
-    function trelloBoard:Commit(force)
+    function trelloBoard:Update(force)
         local count = 0
         local commit = {}
 
-        for i, v in pairs (self._Remote) do
+        for i, v in pairs (tracking) do
             if v ~= self[i] or force then
                 commit[i] = self[i]
                 count = count + 1
@@ -186,7 +187,7 @@ makeBoard = function(client, data)
         HTTP.RequestInsist(commitURL, HTTP.HttpMethod.PUT, "{}", true)
 
         for i, v in pairs(commit) do
-            self._Remote[i] = v
+            tracking[i] = v
         end
     end
 
