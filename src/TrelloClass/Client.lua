@@ -110,16 +110,22 @@ function TrelloClient.new(key, token, errorOnFailure)
     trelloClient.Auth = AUTH_STR
     trelloClient.User = dummyRequest.Body.fullName or ""
 
-    -- Package-private methods - DO NOT USE
+    -- PACKAGE-PRIVATE METHODS - DO NOT USE
     trelloClient._pkg = {}
 
     function trelloClient._pkg.appendBoard(board)
         if localBoards[board.RemoteId] then
-            return false -- Board was not added because it was a duplicate
+            error("Duplicate board id!")
         end
 
         localBoards[board.RemoteId] = board
     end
+
+    function trelloClient._pkg.getBoards()
+        return localBoards
+    end
+
+    -- PUBLIC METHODS
 
     --[[**
         Creates a syntactically correct URL for use within the module. Authentication is automatically appended.

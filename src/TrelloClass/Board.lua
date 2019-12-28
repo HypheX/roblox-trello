@@ -73,7 +73,7 @@ function TrelloBoard.new(name, public, client)
 end
 
 --[[**
-    Fetches a TrelloBoard from Trello.
+    Fetches a board from Trello (includes lists, cards, etc.).
 
     @param [t:String] name The Board's ID.
     @param [t:TrelloClient] client The client the board will be assigned to.
@@ -119,8 +119,6 @@ function TrelloBoard.fetchAllFrom(client)
         organization_fields = ""
     })
 
-    print(commitURL)
-
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
     local body = result.Body
     local boards = {}
@@ -145,13 +143,27 @@ makeBoard = function(client, data)
         Closed = data.closed
     }
 
+    local labels = {}
+
     local trelloBoard = {
         RemoteId = data.id,
+        Client = client,
         Name = data.name,
         Description = data.desc,
         Public = data.prefs.permissionLevel == "public",
         Closed = data.closed,
     }
+
+    -- PACKAGE-PRIVATE METHODS - DO NOT USE
+    trelloBoard._pkg = {}
+
+    function trelloBoard._pkg.appendLabel(label)
+        if labels[label.RemoteId] then
+            error("Duplicate label id!")
+        end
+
+        labels[label.RemoteId] = label
+    end
 
     --[[**
         Pushes all metadata changes to Trello. (Doesn't apply to lists, cards, etc.)
