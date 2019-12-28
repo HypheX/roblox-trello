@@ -147,6 +147,7 @@ makeBoard = function(client, data)
 
     local trelloBoard = {
         RemoteId = data.id,
+        Loaded = false,
         Client = client,
         Name = data.name,
         Description = data.desc,
