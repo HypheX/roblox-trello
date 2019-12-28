@@ -77,6 +77,7 @@ makeLabel = function(board, data)
 
     local trelloLabel = {
         RemoteId = data.id,
+        Client = board.Client,
         Board = board,
         Loaded = true,
         Name = data.name,
