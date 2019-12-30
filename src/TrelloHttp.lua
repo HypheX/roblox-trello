@@ -1,5 +1,5 @@
 --[[
-    Name: http.lua
+    Name: TrelloHttp.lua
     From roblox-trello v2
 
     Description: Wrapper for gracious handling of HTTP(S) requests
