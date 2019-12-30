@@ -19,7 +19,7 @@
 --]]
 
 local CLASS = {}
-local VERSION = "2.0.0-dev.11"
+local VERSION = "2.0.0-dev.12"
 
 for _, c in pairs(script.TrelloClass:GetChildren()) do
     CLASS[c.Name] = require(c).Public
