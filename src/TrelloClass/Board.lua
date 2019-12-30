@@ -19,6 +19,33 @@
 --]]
 
 local HTTP = require(script.Parent.Parent.TrelloHttp)
+local boardFetchTable = {
+    customFields = false,
+    card_pluginData = false,
+    fields = {"name","desc","descData","closed","prefs"},
+}
+local boardIndexDictionary = {
+    RemoteId = "id",
+    Name = "name",
+    Description = "desc",
+    Closed = "closed",
+    Public = {"prefs", "permissionLevel", mut = function(p) return p == "public" end}
+}
+local function getValue(data, index)
+    local i = boardIndexDictionary[index]
+
+    if not i then
+        return nil
+    elseif type(index) == "string" then
+        return data[index]
+    else
+        local x = data
+        for y = 1, #i do
+            x = x[i[y]]
+        end
+        return i.mut(x) or x
+    end
+end
 
 -- TrelloBoard Metatable
 local TrelloBoardMeta = {
@@ -87,11 +114,7 @@ function TrelloBoard.fromRemote(remoteId, client)
         error("[TrelloBoard.fromRemote]: Invalid board id!", 0)
     end
 
-    local commitURL = client:MakeURL("/boards/" .. remoteId, {
-        customFields = false,
-        card_pluginData = false,
-        fields = {"name","desc","descData","closed","prefs"},
-    })
+    local commitURL = client:MakeURL("/boards/" .. remoteId, boardFetchTable)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
 
@@ -136,24 +159,19 @@ makeBoard = function(client, data)
         return nil
     end
 
-    local tracking = {
-        Name = data.name,
-        Description = data.desc,
-        Public = data.prefs.permissionLevel == "public",
-        Closed = data.closed
-    }
-
+    local tracking = {}
     local labels = {}
 
     local trelloBoard = {
-        RemoteId = data.id,
         Loaded = false,
-        Client = client,
-        Name = data.name,
-        Description = data.desc,
-        Public = data.prefs.permissionLevel == "public",
-        Closed = data.closed,
+        Client = client
     }
+
+    for i, _ in pairs(boardIndexDictionary) do
+        local val = getValue(data, i)
+        trelloBoard[i] = val
+        tracking[i] = val
+    end
 
     -- PACKAGE-PRIVATE METHODS - DO NOT USE
     trelloBoard._pkg = {}
@@ -167,13 +185,41 @@ makeBoard = function(client, data)
     end
 
     --[[**
+        Fetches the metadata from Trello and updates the board's metadata. (Doesn't apply to lists, cards, etc.)
+
+        @param [t:Boolean] hard Whether to overwrite changes that you did not push. (Defaults to false, which will do a soft pull)
+
+        @returns [t:Void]
+    **--]]
+    function trelloBoard:Pull(hard)
+        local commitURL = client:MakeURL("/boards/"..self.RemoteId, boardFetchTable)
+
+        local updatedData = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true).Body
+
+        if not updatedData then
+            -- FIXME: HANDLE THIS
+            trelloBoard = nil
+            self = nil
+            error("OOF! Card has been deleted!")
+        end
+
+        for i, _ in pairs(boardIndexDictionary) do
+            local val = getValue(updatedData, i)
+            if hard or self[i] == tracking[i] then
+                self[i] = val
+            end
+            tracking[i] = val
+        end
+    end
+
+    --[[**
         Pushes all metadata changes to Trello. (Doesn't apply to lists, cards, etc.)
 
         @param [t:Boolean] force Whether to push all changes to the board even though nothing has been changed.
 
         @returns [t:Void]
     **--]]
-    function trelloBoard:Update(force)
+    function trelloBoard:Push(force)
         local count = 0
         local commit = {}
 
