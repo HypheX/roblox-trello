@@ -1,5 +1,5 @@
 --[[
-    Name: TrelloClass.lua
+    Name: init.lua
     From roblox-trello v2
 
     Description: Fetches and groups class constructors for Trello.

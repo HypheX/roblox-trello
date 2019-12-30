@@ -1,5 +1,5 @@
 --[[
-    Name: init.lua
+    Name: Client.lua
     From roblox-trello v2
 
     Description: Constructor for Trello clients
