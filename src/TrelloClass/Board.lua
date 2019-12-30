@@ -19,33 +19,19 @@
 --]]
 
 local HTTP = require(script.Parent.Parent.TrelloHttp)
-local boardFetchTable = {
+local commons = require(script.Parent.Parent.Commons)
+local fetchTable = {
     customFields = false,
     card_pluginData = false,
     fields = {"name","desc","descData","closed","prefs"},
 }
-local boardIndexDictionary = {
+local indexDictionary = {
     RemoteId = "id",
     Name = "name",
     Description = "desc",
     Closed = "closed",
     Public = {"prefs", "permissionLevel", mut = function(p) return p == "public" end}
 }
-local function getValue(data, index)
-    local i = boardIndexDictionary[index]
-
-    if not i then
-        return nil
-    elseif type(index) == "string" then
-        return data[index]
-    else
-        local x = data
-        for y = 1, #i do
-            x = x[i[y]]
-        end
-        return i.mut(x) or x
-    end
-end
 
 -- TrelloBoard Metatable
 local TrelloBoardMeta = {
@@ -114,7 +100,7 @@ function TrelloBoard.fromRemote(remoteId, client)
         error("[TrelloBoard.fromRemote]: Invalid board id!", 0)
     end
 
-    local commitURL = client:MakeURL("/boards/" .. remoteId, boardFetchTable)
+    local commitURL = client:MakeURL("/boards/" .. remoteId, fetchTable)
 
     local result = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true)
 
@@ -167,8 +153,8 @@ makeBoard = function(client, data)
         Client = client
     }
 
-    for i, _ in pairs(boardIndexDictionary) do
-        local val = getValue(data, i)
+    for i, _ in pairs(indexDictionary) do
+        local val = commons.getValue(data, i, indexDictionary)
         trelloBoard[i] = val
         tracking[i] = val
     end
@@ -192,7 +178,7 @@ makeBoard = function(client, data)
         @returns [t:Void]
     **--]]
     function trelloBoard:Pull(hard)
-        local commitURL = client:MakeURL("/boards/"..self.RemoteId, boardFetchTable)
+        local commitURL = client:MakeURL("/boards/"..self.RemoteId, fetchTable)
 
         local updatedData = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true).Body
 
@@ -203,8 +189,8 @@ makeBoard = function(client, data)
             error("OOF! Card has been deleted!")
         end
 
-        for i, _ in pairs(boardIndexDictionary) do
-            local val = getValue(updatedData, i)
+        for i, _ in pairs(indexDictionary) do
+            local val = commons.getValue(updatedData, i, indexDictionary)
             if hard or self[i] == tracking[i] then
                 self[i] = val
             end
