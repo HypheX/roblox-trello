@@ -91,7 +91,7 @@ makeLabel = function(board, data)
 
         @returns [t:Void]
     **--]]
-    function trelloLabel:Update(force)
+    function trelloLabel:Push(force)
         local count = 0
         local commit = {}
 
