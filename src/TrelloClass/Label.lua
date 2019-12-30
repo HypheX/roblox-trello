@@ -19,6 +19,16 @@
 --]]
 
 local HTTP = require(script.Parent.Parent.TrelloHttp)
+local commons = require(script.Parent.Parent.Commons)
+
+local fetchTable = {
+    fields = {"name", "color"}
+}
+local indexDictionary = {
+    RemoteId = "id",
+    Name = "name",
+    Color = "color"
+}
 
 local TrelloLabelMeta = {
     __tostring = "TrelloLabel",
@@ -70,19 +80,47 @@ makeLabel = function(board, data)
         return nil
     end
 
-    local tracking = {
-        Name = data.name,
-        Color = data.color
-    }
+    local tracking = {}
 
     local trelloLabel = {
-        RemoteId = data.id,
         Client = board.Client,
         Board = board,
-        Loaded = true,
-        Name = data.name,
-        Color = data.color
+        Loaded = true
     }
+
+    for i, _ in pairs(indexDictionary) do
+        local val = commons.getValue(data, i, indexDictionary)
+        trelloLabel[i] = val
+        tracking[i] = val
+    end
+
+    --[[**
+        Fetches the metadata from Trello and updates the board's metadata. (Doesn't apply to lists, cards, etc.)
+
+        @param [t:Boolean] hard Whether to overwrite changes that you did not push. (Defaults to false, which will do a soft pull)
+
+        @returns [t:Void]
+    **--]]
+    function trelloLabel:Pull(hard)
+        local commitURL = self.Client:MakeURL("/boards/"..self.RemoteId, fetchTable)
+
+        local updatedData = HTTP.RequestInsist(commitURL, HTTP.HttpMethod.GET, nil, true).Body
+
+        if not updatedData then
+            -- FIXME: HANDLE THIS
+            trelloLabel = nil
+            self = nil
+            error("OOF! Card has been deleted!")
+        end
+
+        for i, _ in pairs(indexDictionary) do
+            local val = commons.getValue(updatedData, i, indexDictionary)
+            if hard or self[i] == tracking[i] then
+                self[i] = val
+            end
+            tracking[i] = val
+        end
+    end
 
     --[[**
         Pushes the label's changes to Trello.

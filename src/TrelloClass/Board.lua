@@ -20,6 +20,7 @@
 
 local HTTP = require(script.Parent.Parent.TrelloHttp)
 local commons = require(script.Parent.Parent.Commons)
+
 local fetchTable = {
     customFields = false,
     card_pluginData = false,
