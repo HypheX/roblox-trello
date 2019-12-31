@@ -19,24 +19,10 @@
 --]]
 
 local HTTP = require(script.Parent.Parent.TrelloHttp)
+local commons = require(script.Parent.Parent.Commons)
 local Board = require(script.Parent.Board)
 
--- TrelloClient Metatable
-local TrelloClientMeta = {
-    __tostring = "TrelloClient",
-
-    __metatable = "TrelloClient",
-
-    -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware.
-    __index = function(_, index)
-        error("[TrelloClient]: Attempted to index non-existant property "..tostring(index)..".", 0)
-    end,
-
-    -- This can be bypassed using rawset, but at that point it's not on us
-    __newindex = function(_, index, _)
-        error("[TrelloClient]: Attempted to set non-existant property "..tostring(index)..".", 0)
-    end
-}
+local TrelloClientMeta = commons.generateMeta("TrelloClient")
 
 local TrelloClient = {}
 local function toURL(value)
