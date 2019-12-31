@@ -17,3 +17,19 @@
     The above copyright notice and this permission notice shall be included in
     all copies or substantial portions of the Software.
 --]]
+
+local HTTP = require(script.Parent.Parent.TrelloHttp)
+local commons = require(script.Parent.Parent.Commons)
+
+local fetchTable = {
+    fields = {"id", "closed", "desc", "name", "pos", "idLabels", "idList"}
+}
+local indexDictionary = {
+    RemoteId = "id",
+    Name = "name",
+    Description = "desc",
+    Archived = "closed",
+    Position = "pos"
+}
+
+local TrelloListMeta = commons.generateMeta("TrelloCard")
