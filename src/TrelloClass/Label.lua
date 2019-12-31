@@ -30,21 +30,7 @@ local indexDictionary = {
     Color = "color"
 }
 
-local TrelloLabelMeta = {
-    __tostring = "TrelloLabel",
-
-    __metatable = "TrelloLabel",
-
-    -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware.
-    __index = function(_, index)
-        error("[TrelloLabel]: Attempted to index non-existant property "..tostring(index)..".", 0)
-    end,
-
-    -- This can be bypassed using rawset, but at that point it's not on us
-    __newindex = function(_, index, _)
-        error("[TrelloLabel]: Attempted to set non-existant property "..tostring(index)..".", 0)
-    end
-}
+local TrelloLabelMeta = commons.generateMeta("TrelloLabel")
 
 -- Local function prototype to make a board based on a body dump
 local makeLabel

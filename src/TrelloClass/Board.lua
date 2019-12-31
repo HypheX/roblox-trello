@@ -35,21 +35,7 @@ local indexDictionary = {
 }
 
 -- TrelloBoard Metatable
-local TrelloBoardMeta = {
-    __tostring = "TrelloBoard",
-
-    __metatable = "TrelloBoard",
-
-    -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware.
-    __index = function(_, index)
-        error("[TrelloBoard]: Attempted to index non-existant property "..tostring(index)..".", 0)
-    end,
-
-    -- This can be bypassed using rawset, but at that point it's not on us
-    __newindex = function(_, index, _)
-        error("[TrelloBoard]: Attempted to set non-existant property "..tostring(index)..".", 0)
-    end
-}
+local TrelloBoardMeta = commons.generateMeta("TrelloBoard")
 
 -- Local function prototype to make a board based on a body dump
 local makeBoard

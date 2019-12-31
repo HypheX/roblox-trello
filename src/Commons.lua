@@ -35,4 +35,22 @@ function COMMONS.getValue(data, index, indexDictionary)
     end
 end
 
+function COMMONS.generateMeta(className)
+    return {
+        __tostring = className,
+    
+        __metatable = className,
+    
+        -- Hopefully this will not throw false positives. Functions that will eventually work with this should be aware.
+        __index = function(_, index)
+            error("["..className.."]: Attempted to index non-existant property "..tostring(index)..".", 0)
+        end,
+    
+        -- This can be bypassed using rawset, but at that point it's not on us
+        __newindex = function(_, index, _)
+            error("["..className.."]: Attempted to set non-existant property "..tostring(index)..".", 0)
+        end
+    }
+end
+
 return COMMONS
