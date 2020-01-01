@@ -87,7 +87,7 @@ makeList = function(board, data)
     end
 
     --[[**
-        Fetches the metadata from Trello and updates the board's metadata. (Doesn't apply to lists, cards, etc.)
+        Fetches the metadata from Trello and updates the list's metadata. (Doesn't apply to cards)
 
         @param [t:Boolean] hard Whether to overwrite changes that you made, but did not push. (Defaults to false, which will do a soft pull)
 
@@ -115,9 +115,9 @@ makeList = function(board, data)
     end
 
     --[[**
-        Pushes the label's changes to Trello.
+        Pushes the list's changes to Trello.
 
-        @param [t:Boolean] force Whether to push all changes to the board even though nothing has been changed.
+        @param [t:Boolean] force Whether to push all changes to the list even though nothing has been changed.
 
         @returns [t:Void]
     **--]]
