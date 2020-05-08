@@ -22,11 +22,12 @@
             "warn",
             {
                 "semi": true,
-                "trailingComma": "all",
+                "trailingComma": "none",
                 "singleQuote": false,
                 "printWidth": 120,
                 "tabWidth": 4,
                 "useTabs": false,
+                "arrowParens": "always",
                 "endOfLine": "crlf"
             }
         ],
@@ -38,7 +39,8 @@
             }
         ],
         "@typescript-eslint/no-unused-vars": "warn",
-        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-function-return-type": "warn",
+        "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-empty-function": "warn",

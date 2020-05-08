@@ -38,7 +38,7 @@ interface Client {
      */
     MakeURL(
         page: string,
-        queryParams?: Map<string, string | boolean | number | Array<string> | Map<string, string | boolean | number>>,
+        queryParams?: Map<string, string | boolean | number | Array<string> | Map<string, string | boolean | number>>
     ): string;
 }
 
