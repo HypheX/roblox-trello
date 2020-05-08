@@ -38,7 +38,16 @@ interface Client {
      */
     MakeURL(
         page: string,
-        queryParams?: Map<string, string | boolean | number | Array<string> | Map<string, string | boolean | number>>
+        queryParams?: {
+            [k: string]:
+                | keyof string
+                | boolean
+                | number
+                | Array<string>
+                | {
+                      [k: string]: keyof string | boolean | number;
+                  };
+        }
     ): string;
 }
 
@@ -103,7 +112,7 @@ interface TrelloBoardConstructor {
      *
      *  @returns The Trello Board fetched. Undefined if the board doesn't exist.
      */
-    fromRemote: (remoteId: string, entity: Client) => Board | undefined;
+    readonly fromRemote: (remoteId: string, entity: Client) => Board | undefined;
 
     /**
      *  @yields Fetches all the boards the provided entity has edit access to.
@@ -112,7 +121,7 @@ interface TrelloBoardConstructor {
      *
      *  @returns An array containing zero or more trello boards.
      */
-    fetchAllFrom: (entity: Client) => Array<Board>;
+    readonly fetchAllFrom: (entity: Client) => Array<Board>;
 }
 
 // Unimplemented interfaces
@@ -170,5 +179,8 @@ interface TrelloLabelConstructor {
 
 declare const Client: TrelloClientConstructor;
 declare const Board: TrelloBoardConstructor;
+declare const List: TrelloListConstructor;
+declare const Card: TrelloCardConstructor;
+declare const Label: TrelloLabelConstructor;
 
 export { Client, Board, Label, LabelColor };
