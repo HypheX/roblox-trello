@@ -134,6 +134,7 @@ makeBoard = function(client, data)
 
     local tracking = {}
     local labels = {}
+    local lists = {}
 
     local trelloBoard = {
         Loaded = false,
@@ -155,6 +156,24 @@ makeBoard = function(client, data)
         end
 
         labels[label.RemoteId] = label
+    end
+
+    function trelloBoard._pkg.appendList(list)
+        if list[list.RemoteId] then
+            error("Duplicate list id!")
+        end
+
+        lists[list.RemoteId] = list
+    end
+
+    function trelloBoard._pkg.labelBelongsHere(label)
+        for i, l in pairs(labels) do
+            if i == label.RemoteId and l == label then
+                return true
+            end
+        end
+
+        return false
     end
 
     --[[**

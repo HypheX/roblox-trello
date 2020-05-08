@@ -1,6 +1,9 @@
 <h1><p align=center>Roblox Trello (v2-dev)</p></h1>
 <h2><p align=center>🐉 Here be dragons! 🐉</p></h2>
-<h4><p align=center>Current Developer Version: [2.0.0-dev.6]</p></h4>
+
+<a href="https://www.npmjs.com/package/@rbxts/trello">
+    <p align=center><img src="https://badge.fury.io/js/%40rbxts%2Ftrello.svg"></p>
+</a>
 
 If you need help, join our [Discord Server](https://www.discord.gg/RBhP6Ad)!
 
