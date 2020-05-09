@@ -22,106 +22,149 @@
  *  You can create and handle more than one TrelloClient at a given time, effectively controlling more than two accounts at the same time.
  */
 interface Client {
-    /** The authentication string that is appended at the end of the API URL's. DO NOT EXPOSE THIS STRING TO THE CLIENT! */
-    readonly Auth: string;
-
     /** The username associated with the Trello account being managed by this TrelloClient. */
     readonly User: string | undefined;
 
+    GetBoards(): Promise<Array<Board>>;
+
     /**
-     *  Creates a syntactically correct URL for use within the module. Authentication is automatically appended.
+     * @yields Gets all boards in a given client. Boards are not deeply loaded.
      *
-     *  @param page The page that you wish to request to. Base URL is https://api.trello.com/1/ (page cannot be empty). Example: "/batch"
-     *  @param queryParams A map containing any parameters you wish to pass. Example: {urls: ["/members", "/boards"]}
-     *
-     *  @returns A URL you can make requests to.
+     * @returns An array containing zero or more Trello boards.
      */
-    MakeURL(
-        page: string,
-        queryParams?: {
-            [k: string]:
-                | keyof string
-                | boolean
-                | number
-                | Array<string>
-                | {
-                      [k: string]: keyof string | boolean | number;
-                  };
-        }
-    ): string;
+    AwaitGetBoards(): Array<Board>;
+
+    GetBoard(remoteId: string): Promise<Board | undefined>;
+
+    AwaitGetBoard(remoteId: string): Board | undefined;
 }
 
 interface TrelloClientConstructor {
     /**
-     *  @constructor @yields Creates a new TrelloClient, that represents a Trello account.
+     * @constructor Creates a new TrelloClient, that represents a Trello account.
      *
-     *  @param key Your developer key. Cannot be empty or undefined.
-     *  @param token Your developer token. Optional if you're only READING from a PUBLIC board.
-     *  @param errorOnFailure Whether an error should be thrown (instead of a warning) if key validation fails.
+     * @param key Your developer key. Cannot be empty or undefined.
+     * @param token Your developer token. Optional if you're only READING from a PUBLIC board.
      *
-     *  @returns a client object. If 'errorOnFailure` is false, the constructor might return `undefined` if key validation fails
+     * @returns A promise that resolves to a client when available.
      */
-    new <Err extends boolean>(key: string, token?: string | undefined, errorOnFailure?: Err): Err extends true
-        ? Client
-        : Client | undefined;
+    new (key: string, token?: string | undefined): Promise<Client>;
+
+    /**
+     * @constructor @yields Creates a new TrelloClient, that represents a Trello account.
+     *
+     * @param key Your developer key. Cannot be empty or undefined.
+     * @param token Your developer token. Optional if you're only READING from a PUBLIC board.
+     * @param throwOnFailure Whether an error should be thrown (instead of a warning) if key validation fails.
+     *
+     * @returns A client object. If 'throwOnFailure` is false, the constructor might return `undefined` if key validation fails
+     */
+    readonly awaitNew: <Err extends boolean>(
+        key: string,
+        token?: string | undefined,
+        throwOnFailure?: Err
+    ) => Err extends true ? Client : Client | undefined;
 }
 
 // Trello Entities
 interface Entity {
     readonly RemoteId: string;
-    readonly Loaded: boolean;
     readonly Client: Client;
     Name: string;
 
     /**
-     *  Pushes all metadata changes to Trello. (Doesn't apply to subentities.)
+     * Pushes all metadata changes to Trello. (Doesn't apply to subentities.)
      *
-     *  @param force Whether to push all changes to Trello even though nothing has been changed.
+     * @param force Whether to push all changes to Trello even though nothing has been changed.
+     *
+     * @returns A promise that resolves when the changes are applied.
      */
-    Update(force?: boolean): void;
+    Push(force?: boolean): Promise<void>;
 
     /**
-     *  Deletes this entity (and subentities) from Trello.
+     * @yields Pushes all metadata changes to Trello. (Doesn't apply to subentities.)
+     *
+     * @param force Whether to push all changes to Trello even though nothing has been changed.
      */
-    Delete(): void;
+    AwaitPush(force?: boolean): void;
+
+    /**
+     * Force-pulls the most recent board metadata from Trello (Doesn't apply to subentities.)
+     *
+     * @returns Promise that resolves on update
+     */
+    Pull(): Promise<void>;
+
+    /**
+     * @yields Force-pulls the most recent board metadata from Trello (Doesn't apply to subentities.)
+     */
+    AwaitPull(): void;
+
+    /**
+     * Deletes this entity (and subentities) from Trello.
+     *
+     * @returns A promise that resolves when thee board is gone for good.
+     */
+    Delete(): Promise<void>;
+
+    /**
+     * @yields Deletes this entity (and subentities) from Trello.
+     */
+    AwaitDelete(): void;
 }
 
 interface Board extends Entity {
+    readonly DeepLoaded: boolean;
     Description: string;
     Public: boolean;
     Closed: boolean;
+
+    /**
+     * Deeploads the board (everything from it is requested)
+     *
+     * @returns A promise that is resolved when the deep load operation finishes.
+     */
+    DeepLoad(): Promise<void>;
+
+    /**
+     * @yields Deep-loads the board (so that it contains lists, cards, etc.)
+     */
+    AwaitDeepLoad(): void;
+
+    /**
+     * Returns the board's lists. Returns undefined if the board is not deep-loaded yet.
+     */
+    GetLists(): Array<List> | undefined;
+
+    /**
+     * Returns a list with the given id.
+     * Returns undefined is the board is not deep-loaded or if the list doesn't exist within the board.
+     */
+    GetList(id: string): List | undefined;
 }
 
 interface TrelloBoardConstructor {
     /**
-     *  @constructor @yields Creates a new Trello board, that is then also created on Trello.
+     * @constructor @yields Creates a new Trello board, that is then also created on Trello.
      *
-     *  @param entity The entity the board will be assigned to.
-     *  @param name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
-     *  @param public Whether the new board should be public or not. If this field is not provided, the board will be private.
+     * @param name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
+     * @param public Whether the new board should be public or not. If this field is not provided, the board will be private.
+     * @param client The entity the board will be assigned to.
      *
-     *  @returns A new TrelloBoard that was freshly created.
+     * @returns A new TrelloBoard that was freshly created.
      */
-    new (name: string, public: boolean, entity: Client): Board;
+    new (name: string, public: boolean, client: Client): Promise<Board>;
 
     /**
-     *  @yields Fetches a TrelloBoard from Trello.
+     * @constructor @yields Creates a new Trello board, that is then also created on Trello.
      *
-     *  @param entity The entity the board will be assigned to.
-     *  @param remoteId The board's ID.
+     * @param name The Board's name. Must to be a non-empty string with a maximum of 16384 characters.
+     * @param public Whether the new board should be public or not. If this field is not provided, the board will be private.
+     * @param client The entity the board will be assigned to.
      *
-     *  @returns The Trello Board fetched. Undefined if the board doesn't exist.
+     * @returns A brand new, freshly created Trello Board.
      */
-    readonly fromRemote: (remoteId: string, entity: Client) => Board | undefined;
-
-    /**
-     *  @yields Fetches all the boards the provided entity has edit access to.
-     *
-     *  @param entity The entity where to fetch the boards from.
-     *
-     *  @returns An array containing zero or more trello boards.
-     */
-    readonly fetchAllFrom: (entity: Client) => Array<Board>;
+    readonly awaitNew: (name: string, public: boolean, entity: Client) => Board;
 }
 
 // Unimplemented interfaces
