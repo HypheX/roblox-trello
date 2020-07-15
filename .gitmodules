@@ -1,0 +1,3 @@
+[submodule "vendor/http-queue"]
+	path = vendor/http-queue
+	url = https://github.com/ddavness/roblox-http-queue
